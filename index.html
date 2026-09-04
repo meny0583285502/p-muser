@@ -1,0 +1,1662 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0D9488">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800&family=Assistant:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<title>פניני חיזוק - כספים</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+/* ===================== Design tokens ===================== */
+:root {
+  --color-primary:#0D9488; --color-primary-dark:#0F766E; --color-primary-light:#2DD4BF; --color-primary-bg:#F0FDFA;
+  --color-success:#10B981; --color-success-bg:#ECFDF5; --color-success-text:#047857;
+  --color-danger:#EF4444; --color-danger-bg:#FEF2F2; --color-danger-text:#B91C1C;
+  --color-warning:#F59E0B; --color-warning-bg:#FFFBEB; --color-warning-text:#B45309;
+  --color-gold:#B45309; --color-gold-bg:#FFFBEB;
+  --color-neutral-bg:#F1F5F9; --color-neutral-text:#475569;
+  --bg:#F8FAFC; --surface:#FFFFFF; --surface-2:#FBFCFE; --border:#E6EAF0; --border-strong:#D6DCE5;
+  --text-title:#0F172A; --text-body:#334155; --text-secondary:#64748B; --text-muted:#94A3B8;
+  --radius-sm:8px; --radius-md:12px; --radius-lg:16px; --radius-full:999px;
+  --shadow-sm:0 1px 2px rgba(15,23,42,.05); --shadow-md:0 6px 16px rgba(15,23,42,.06); --shadow-lg:0 16px 40px rgba(15,23,42,.12);
+  --sidebar-w:264px; --header-h:64px;
+  --font:'Heebo','Assistant',system-ui,-apple-system,sans-serif;
+  --ease:cubic-bezier(.4,0,.2,1);
+}
+[data-theme="dark"] {
+  --bg:#0B1220; --surface:#111A2C; --surface-2:#0E1729; --border:#1E293B; --border-strong:#293548;
+  --text-title:#F1F5F9; --text-body:#CBD5E1; --text-secondary:#94A3B8; --text-muted:#64748B;
+  --color-primary-bg:#0B2C29; --color-success-bg:#062E22; --color-success-text:#34D399;
+  --color-danger-bg:#3A1213; --color-danger-text:#F87171; --color-warning-bg:#3A2A05; --color-warning-text:#FBBF24;
+  --color-gold-bg:#3A2A05;
+  --color-neutral-bg:#1B2536; --color-neutral-text:#94A3B8;
+  --shadow-sm:0 1px 2px rgba(0,0,0,.3); --shadow-md:0 6px 16px rgba(0,0,0,.35); --shadow-lg:0 16px 40px rgba(0,0,0,.5);
+}
+* { box-sizing:border-box; }
+*:not(svg):not(path) { font-family:var(--font); }
+html,body { margin:0; padding:0; }
+body { background:var(--bg); color:var(--text-body); min-height:100vh; -webkit-font-smoothing:antialiased; }
+button, input, select, textarea { font-family:var(--font); }
+a { color:var(--color-primary); }
+::selection { background:var(--color-primary-bg); }
+.hidden { display:none !important; }
+.sr-only { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0); }
+
+/* Typography scale */
+.page-title { font-size:24px; font-weight:800; color:var(--text-title); letter-spacing:-.3px; margin:0; }
+.section-title { font-size:16px; font-weight:700; color:var(--text-title); margin:0 0 14px; }
+.card-title { font-size:13px; font-weight:600; color:var(--text-secondary); }
+.text-body { font-size:14px; color:var(--text-body); }
+.text-secondary { font-size:13px; color:var(--text-secondary); }
+.text-caption { font-size:12px; color:var(--text-muted); }
+.num { font-variant-numeric:tabular-nums; font-weight:700; letter-spacing:-.2px; }
+
+/* ===================== App shell ===================== */
+#appShell { display:flex; min-height:100vh; }
+#sidebar {
+  width:var(--sidebar-w); flex-shrink:0; background:var(--surface); border-left:1px solid var(--border);
+  display:flex; flex-direction:column; position:sticky; top:0; height:100vh; z-index:40; transition:transform .25s var(--ease);
+}
+.sidebar-logo { display:flex; align-items:center; gap:10px; padding:20px 20px 16px; }
+.sidebar-logo .mark { width:36px; height:36px; border-radius:10px; background:var(--color-primary); display:flex; align-items:center; justify-content:center; color:#fff; flex-shrink:0; }
+.sidebar-logo .mark svg { width:20px; height:20px; }
+.sidebar-logo b { font-size:15px; font-weight:800; color:var(--text-title); line-height:1.25; }
+.sidebar-nav { flex:1; overflow-y:auto; padding:8px 12px; display:flex; flex-direction:column; gap:2px; }
+.nav-item {
+  display:flex; align-items:center; gap:11px; padding:10px 12px; border-radius:var(--radius-sm); color:var(--text-body);
+  font-size:13.5px; font-weight:500; cursor:pointer; border:none; background:none; width:100%; text-align:right; transition:background .15s,color .15s;
+}
+.nav-item svg { width:18px; height:18px; flex-shrink:0; color:var(--text-secondary); transition:color .15s; }
+.nav-item:hover { background:var(--color-neutral-bg); }
+.nav-item.active { background:var(--color-primary-bg); color:var(--color-primary-dark); font-weight:700; }
+.nav-item.active svg { color:var(--color-primary); }
+.nav-group-head { display:flex; align-items:center; gap:11px; padding:10px 12px; border-radius:var(--radius-sm); color:var(--text-body);
+  font-size:13.5px; font-weight:600; cursor:pointer; border:none; background:none; width:100%; text-align:right; }
+.nav-group-head:hover { background:var(--color-neutral-bg); }
+.nav-group-head svg.chev { width:15px; height:15px; margin-inline-start:auto; color:var(--text-muted); transition:transform .18s var(--ease); }
+.nav-group.open .nav-group-head svg.chev { transform:rotate(-90deg); }
+.nav-group-items { display:flex; flex-direction:column; gap:2px; padding-inline-start:14px; max-height:0; overflow:hidden; transition:max-height .2s var(--ease); }
+.nav-group.open .nav-group-items { max-height:400px; }
+.nav-group-items .nav-item { font-size:13px; padding:8px 12px; }
+.sidebar-section-label { font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:.5px; padding:14px 12px 6px; }
+.sidebar-footer { border-top:1px solid var(--border); padding:14px; display:flex; align-items:center; gap:10px; }
+.avatar { width:34px; height:34px; border-radius:var(--radius-full); background:var(--color-primary-bg); color:var(--color-primary-dark); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:13px; flex-shrink:0; }
+.sidebar-footer .who { min-width:0; flex:1; }
+.sidebar-footer .who .name { font-size:13px; font-weight:600; color:var(--text-title); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.sidebar-footer .who .role { font-size:11.5px; color:var(--text-muted); }
+.sidebar-footer .menu-btn { background:none; border:none; color:var(--text-secondary); cursor:pointer; padding:6px; border-radius:var(--radius-sm); }
+.sidebar-footer .menu-btn:hover { background:var(--color-neutral-bg); }
+
+#mainCol { flex:1; min-width:0; display:flex; flex-direction:column; }
+#topHeader {
+  height:var(--header-h); position:sticky; top:0; z-index:30; background:var(--surface); border-bottom:1px solid var(--border);
+  display:flex; align-items:center; justify-content:space-between; padding:0 24px; gap:16px;
+}
+.header-left { display:flex; align-items:center; gap:12px; min-width:0; }
+#hamburgerBtn { display:none; background:none; border:none; cursor:pointer; color:var(--text-body); padding:6px; }
+.breadcrumb { font-size:12.5px; color:var(--text-muted); }
+.header-right { display:flex; align-items:center; gap:8px; }
+.icon-btn { background:none; border:1px solid transparent; width:36px; height:36px; border-radius:var(--radius-sm); display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--text-secondary); position:relative; }
+.icon-btn:hover { background:var(--color-neutral-bg); color:var(--text-title); }
+.icon-btn svg { width:18px; height:18px; }
+
+#contentArea { flex:1; padding:24px; }
+.content-max { max-width:1180px; margin:0 auto; }
+
+/* ===================== Cards ===================== */
+.card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); box-shadow:var(--shadow-sm); }
+.panel { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); box-shadow:var(--shadow-sm); padding:22px; margin-bottom:20px; }
+.panel.hidden { display:none; }
+.panel-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; gap:12px; flex-wrap:wrap; }
+.panel-head .section-title { margin:0; }
+
+.stat-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:22px; }
+@media (max-width:980px) { .stat-grid { grid-template-columns:repeat(2,1fr); } }
+@media (max-width:560px) { .stat-grid { grid-template-columns:1fr; } }
+.stat-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:18px 18px; box-shadow:var(--shadow-sm); cursor:pointer; transition:transform .15s var(--ease), box-shadow .15s var(--ease); }
+.stat-card:hover { transform:translateY(-2px); box-shadow:var(--shadow-md); border-color:var(--border-strong); }
+.stat-card .row1 { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:10px; }
+.stat-icon { width:34px; height:34px; border-radius:var(--radius-sm); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.stat-icon svg { width:17px; height:17px; }
+.stat-icon.primary { background:var(--color-primary-bg); color:var(--color-primary); }
+.stat-icon.warn { background:var(--color-warning-bg); color:var(--color-warning-text); }
+.stat-icon.danger { background:var(--color-danger-bg); color:var(--color-danger-text); }
+.stat-icon.success { background:var(--color-success-bg); color:var(--color-success-text); }
+.stat-icon.gold { background:var(--color-gold-bg); color:var(--color-gold); }
+.stat-value { font-size:24px; font-weight:800; color:var(--text-title); letter-spacing:-.5px; }
+.stat-trend { font-size:12px; margin-top:6px; color:var(--text-muted); }
+
+.tabs { display:flex; gap:6px; margin-bottom:18px; flex-wrap:wrap; }
+.tabs button {
+  padding:8px 14px; border:1px solid var(--border); background:var(--surface); border-radius:var(--radius-full);
+  cursor:pointer; font-size:13px; font-weight:500; color:var(--text-body); display:flex; align-items:center; gap:6px; transition:.15s;
+}
+.tabs button svg { width:14px; height:14px; }
+.tabs button:hover { border-color:var(--color-primary-light); color:var(--color-primary-dark); }
+.tabs button.active { background:var(--color-primary); color:#fff; border-color:var(--color-primary); }
+
+/* ===================== Forms ===================== */
+form.grid-form { display:grid; grid-template-columns:repeat(2,1fr); gap:14px; align-items:start; }
+form.grid-form > button, form.grid-form > .msg, form.grid-form > .full-width { grid-column:1 / -1; }
+@media (max-width:640px) { form.grid-form { grid-template-columns:1fr; } }
+.field { display:flex; flex-direction:column; gap:6px; }
+.field label { font-size:12.5px; font-weight:600; color:var(--text-body); }
+label.field-label { font-size:12.5px; font-weight:600; color:var(--text-body); display:block; margin-bottom:6px; }
+input, select, textarea {
+  padding:10px 13px; font-size:14px; border:1px solid var(--border-strong); border-radius:var(--radius-sm);
+  background:var(--surface-2); color:var(--text-title); width:100%; transition:border-color .15s, box-shadow .15s;
+}
+input::placeholder, textarea::placeholder { color:var(--text-muted); }
+input:focus, select:focus, textarea:focus { outline:none; border-color:var(--color-primary); box-shadow:0 0 0 3px var(--color-primary-bg); background:var(--surface); }
+textarea { resize:vertical; font-family:var(--font); }
+input[type=file] { padding:9px 12px; }
+input[type=checkbox] { width:auto; }
+
+button.action, .btn { padding:10px 18px; font-size:13.5px; font-weight:600; border:1px solid var(--color-primary); border-radius:var(--radius-sm); background:var(--color-primary); color:#fff; cursor:pointer; display:inline-flex; align-items:center; gap:7px; transition:background .15s,transform .1s,box-shadow .15s; }
+button.action svg, .btn svg { width:15px; height:15px; }
+button.action:hover, .btn:hover { background:var(--color-primary-dark); border-color:var(--color-primary-dark); box-shadow:0 4px 12px rgba(13,148,136,.25); }
+button.action:active, .btn:active { transform:translateY(1px); }
+button.action:disabled, .btn:disabled { opacity:.55; cursor:not-allowed; box-shadow:none; transform:none; }
+button.secondary, .btn-secondary { background:var(--surface); color:var(--text-body); border-color:var(--border-strong); }
+button.secondary:hover, .btn-secondary:hover { background:var(--color-neutral-bg); box-shadow:none; border-color:var(--border-strong); }
+button.danger, .btn-danger { background:var(--color-danger); border-color:var(--color-danger); }
+button.danger:hover, .btn-danger:hover { background:#DC2626; border-color:#DC2626; box-shadow:0 4px 12px rgba(239,68,68,.25); }
+.btn-ghost { background:none; border-color:transparent; color:var(--color-primary); padding:6px 8px; }
+.btn-ghost:hover { background:var(--color-primary-bg); box-shadow:none; }
+.btn-sm { padding:6px 11px; font-size:12.5px; }
+.btn-icon { width:32px; height:32px; padding:0; justify-content:center; }
+
+.msg { font-size:12.5px; min-height:16px; margin-top:2px; display:flex; align-items:center; gap:6px; }
+.msg.ok { color:var(--color-success-text); }
+.msg.err { color:var(--color-danger-text); }
+a.file-link { color:var(--color-primary); text-decoration:none; font-weight:600; }
+a.file-link:hover { text-decoration:underline; }
+
+/* ===================== Badges ===================== */
+.badge { display:inline-flex; align-items:center; gap:5px; padding:4px 10px; border-radius:var(--radius-full); font-size:12px; font-weight:600; white-space:nowrap; }
+.badge svg { width:12px; height:12px; }
+.badge-success { background:var(--color-success-bg); color:var(--color-success-text); }
+.badge-warning { background:var(--color-warning-bg); color:var(--color-warning-text); }
+.badge-danger { background:var(--color-danger-bg); color:var(--color-danger-text); }
+.badge-neutral { background:var(--color-neutral-bg); color:var(--color-neutral-text); }
+.badge-gold { background:var(--color-gold-bg); color:var(--color-gold); }
+select.cat-select { appearance:none; -webkit-appearance:none; padding:5px 26px 5px 10px; font-size:12px; font-weight:600; border-radius:var(--radius-full); background-color:var(--color-primary-bg); color:var(--color-primary-dark); border:1px solid transparent; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%230F766E' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:left 9px center; width:auto; min-width:110px; }
+
+/* ===================== Tables ===================== */
+.table-wrap { overflow-x:auto; border-radius:var(--radius-md); border:1px solid var(--border); }
+table.data-table { width:100%; border-collapse:collapse; font-size:13.5px; background:var(--surface); }
+table.data-table th, table.data-table td { text-align:right; padding:12px 14px; border-bottom:1px solid var(--border); color:var(--text-body); vertical-align:middle; }
+table.data-table th { color:var(--text-secondary); font-weight:600; font-size:11.5px; text-transform:uppercase; letter-spacing:.4px; background:var(--surface-2); white-space:nowrap; }
+table.data-table tbody tr { transition:background .1s; }
+table.data-table tbody tr:hover { background:var(--surface-2); }
+table.data-table tbody tr:last-child td { border-bottom:none; }
+table.data-table td[contenteditable="true"] { cursor:text; border-bottom:1px dashed var(--color-primary-light); border-radius:4px; }
+table.data-table td[contenteditable="true"]:focus { outline:none; background:var(--color-primary-bg); }
+.num-cell { font-variant-numeric:tabular-nums; font-weight:700; }
+
+@media (max-width:860px) {
+  table.data-table thead { display:none; }
+  table.data-table, table.data-table tbody, table.data-table tr, table.data-table td { display:block; width:100%; }
+  .table-wrap { border:none; }
+  table.data-table tbody tr { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-md); margin-bottom:10px; padding:4px 14px; box-shadow:var(--shadow-sm); }
+  table.data-table td { display:flex; justify-content:space-between; align-items:center; gap:14px; padding:9px 0; border-bottom:1px solid var(--border); text-align:left; }
+  table.data-table td:last-child { border-bottom:none; }
+  table.data-table td[data-label]::before { content:attr(data-label); font-size:11.5px; font-weight:600; color:var(--text-secondary); flex-shrink:0; }
+}
+
+/* Empty / loading states */
+.state-block { display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:46px 20px; color:var(--text-secondary); }
+.state-block .state-icon { width:52px; height:52px; border-radius:var(--radius-full); background:var(--color-primary-bg); color:var(--color-primary); display:flex; align-items:center; justify-content:center; margin-bottom:16px; }
+.state-block .state-icon svg { width:24px; height:24px; }
+.state-block h3 { font-size:15px; font-weight:700; color:var(--text-title); margin:0 0 6px; }
+.state-block p { font-size:13px; margin:0 0 16px; max-width:340px; line-height:1.6; }
+
+.skel { background:linear-gradient(90deg,var(--color-neutral-bg) 25%, var(--border) 37%, var(--color-neutral-bg) 63%); background-size:400% 100%; animation:skel-shine 1.4s ease infinite; border-radius:6px; }
+@keyframes skel-shine { 0%{background-position:100% 50%} 100%{background-position:0 50%} }
+.skel-row td { padding:14px; }
+.skel-line { height:14px; border-radius:6px; }
+
+/* ===================== Toasts ===================== */
+#toastHost { position:fixed; bottom:20px; left:20px; z-index:400; display:flex; flex-direction:column; gap:10px; max-width:340px; }
+.toast { background:var(--text-title); color:#fff; padding:12px 16px; border-radius:var(--radius-md); font-size:13px; font-weight:500; box-shadow:var(--shadow-lg); display:flex; align-items:center; gap:10px; animation:toast-in .2s var(--ease); }
+[data-theme="dark"] .toast { background:var(--surface); border:1px solid var(--border-strong); }
+.toast svg { width:17px; height:17px; flex-shrink:0; }
+.toast.ok svg { color:#34D399; }
+.toast.err svg { color:#F87171; }
+@keyframes toast-in { from{opacity:0; transform:translateY(10px)} to{opacity:1; transform:translateY(0)} }
+
+/* ===================== Modals ===================== */
+.modal-overlay { position:fixed; inset:0; background:rgba(15,23,42,.55); z-index:200; display:none; align-items:flex-start; justify-content:center; padding:60px 16px; overflow-y:auto; animation:fade-in .15s var(--ease); }
+.modal-overlay.show { display:flex; }
+@keyframes fade-in { from{opacity:0} to{opacity:1} }
+.modal-box { background:var(--surface); border-radius:var(--radius-lg); box-shadow:var(--shadow-lg); width:100%; max-width:460px; overflow:hidden; animation:modal-in .18s var(--ease); }
+.modal-box.wide { max-width:660px; }
+@keyframes modal-in { from{opacity:0; transform:translateY(10px) scale(.98)} to{opacity:1; transform:translateY(0) scale(1)} }
+.modal-header { display:flex; align-items:center; justify-content:space-between; padding:18px 22px; border-bottom:1px solid var(--border); }
+.modal-header h2 { font-size:16px; font-weight:700; color:var(--text-title); margin:0; }
+.modal-body { padding:22px; max-height:70vh; overflow-y:auto; }
+.modal-footer { padding:16px 22px; border-top:1px solid var(--border); display:flex; gap:10px; justify-content:flex-start; }
+.modal-close { background:none; border:none; cursor:pointer; color:var(--text-secondary); width:32px; height:32px; border-radius:var(--radius-sm); display:flex; align-items:center; justify-content:center; }
+.modal-close:hover { background:var(--color-neutral-bg); }
+
+/* ===================== Login screen ===================== */
+#loginScreen { min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px; background:var(--bg); }
+.login-box { width:100%; max-width:420px; }
+.login-brand { display:flex; flex-direction:column; align-items:center; text-align:center; margin-bottom:26px; }
+.login-brand .mark { width:52px; height:52px; border-radius:14px; background:var(--color-primary); display:flex; align-items:center; justify-content:center; color:#fff; margin-bottom:14px; box-shadow:0 8px 20px rgba(13,148,136,.3); }
+.login-brand .mark svg { width:26px; height:26px; }
+.login-brand h1 { font-size:22px; font-weight:800; color:var(--text-title); margin:0 0 6px; }
+.login-brand p { font-size:13.5px; color:var(--text-secondary); margin:0; }
+.user-pick-btn { display:flex; align-items:center; gap:10px; width:100%; padding:12px 14px; margin-bottom:8px; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-md); cursor:pointer; font-size:14px; font-weight:600; color:var(--text-title); text-align:right; transition:.15s; }
+.user-pick-btn:hover { border-color:var(--color-primary); background:var(--color-primary-bg); }
+.user-pick-btn .avatar { background:var(--color-neutral-bg); color:var(--text-secondary); }
+
+/* Responsive: mobile sidebar drawer */
+#sidebarBackdrop { display:none; position:fixed; inset:0; background:rgba(15,23,42,.45); z-index:39; }
+@media (max-width:900px) {
+  #sidebar { position:fixed; top:0; bottom:0; right:0; transform:translateX(100%); box-shadow:var(--shadow-lg); }
+  #sidebar.open { transform:translateX(0); }
+  #sidebarBackdrop.show { display:block; }
+  #hamburgerBtn { display:flex; }
+  #contentArea { padding:16px; }
+  .stat-grid { gap:10px; }
+}
+@media (max-width:640px) {
+  .panel { padding:16px; border-radius:var(--radius-md); }
+  .page-title { font-size:20px; }
+  #topHeader { padding:0 14px; }
+}
+
+/* ===================== רכיבים ייחודיים לאפליקציה זו ===================== */
+.inventory-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(230px,1fr)); gap:14px; }
+.inv-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-md); padding:16px; cursor:pointer; transition:.15s; }
+.inv-card:hover { border-color:var(--color-primary-light); box-shadow:var(--shadow-sm); transform:translateY(-1px); }
+.inv-card .inv-book { font-size:13.5px; font-weight:700; color:var(--text-title); }
+.inv-card .inv-edition { font-size:11.5px; color:var(--text-muted); margin-bottom:8px; }
+.inv-card .inv-qty { font-size:22px; font-weight:800; color:var(--color-primary-dark); }
+.inv-card .inv-low { color:var(--color-danger-text); }
+.set-item-row { display:flex; gap:8px; align-items:center; padding:8px 0; border-bottom:1px solid var(--border); flex-wrap:wrap; }
+.set-item-row:last-child { border-bottom:none; }
+.set-item-row .lbl { font-size:13px; color:var(--text-body); }
+.set-item-row select.si-book { flex:1 1 220px; min-width:180px; }
+.set-item-row input.si-num { flex:0 1 110px; min-width:90px; }
+.set-item-row .si-stock { flex:0 0 auto; font-size:11.5px; color:var(--text-muted); white-space:nowrap; }
+.set-item-row .si-remove { flex:0 0 auto; }
+.install-banner { display:flex; align-items:center; justify-content:space-between; gap:12px; background:var(--color-primary-bg); border:1px solid var(--color-primary-light); border-radius:var(--radius-md); padding:12px 16px; margin-bottom:16px; flex-wrap:wrap; }
+.install-banner p { margin:0; font-size:13px; color:var(--color-primary-dark); font-weight:600; }
+.direction-tabs { display:flex; gap:6px; margin-bottom:16px; }
+.direction-tabs button { flex:1; }
+</style>
+</head>
+<body>
+
+  <!-- ===================== Login screen ===================== -->
+  <div id="loginScreen">
+    <div class="login-box">
+      <div class="login-brand">
+        <div class="mark"><i data-lucide="gem"></i></div>
+        <h1>פניני חיזוק - כספים</h1>
+        <p>ניהול הוצאות, הכנסות, חובות ומלאי ספרים</p>
+      </div>
+      <div class="panel">
+        <h2 class="section-title">בחר משתמש</h2>
+        <div id="userList"></div>
+
+        <div id="loginPrompt" style="display:none;margin-top:14px;">
+          <label class="field-label">התחברות: <b id="lp_username" style="color:var(--text-title)"></b></label>
+          <input type="password" id="lp_password" placeholder="סיסמה" style="margin-bottom:10px;">
+          <div style="display:flex;gap:8px;">
+            <button class="action" onclick="doLogin()"><i data-lucide="log-in"></i>כניסה</button>
+            <button class="action secondary" onclick="document.getElementById('loginPrompt').style.display='none'">ביטול</button>
+          </div>
+          <div class="msg" id="lp_msg"></div>
+        </div>
+
+        <button class="action secondary" style="margin-top:14px;width:100%;justify-content:center;" onclick="document.getElementById('newUserForm').style.display='block';this.style.display='none'"><i data-lucide="user-plus"></i>משתמש חדש</button>
+        <form id="newUserForm" class="grid-form" style="display:none;margin-top:14px;grid-template-columns:1fr;">
+          <input type="text" id="nu_fullname" placeholder="שם מלא" required>
+          <input type="text" id="nu_username" placeholder="שם משתמש" required>
+          <input type="password" id="nu_password" placeholder="סיסמה" required>
+          <input type="tel" id="nu_phone" placeholder="טלפון (אופציונלי)">
+          <input type="email" id="nu_email" placeholder="אימייל (אופציונלי)">
+          <input type="password" id="nu_admin" placeholder="סיסמת מנהל לאישור" required>
+          <button class="action" type="submit"><i data-lucide="check"></i>צור משתמש</button>
+          <div class="msg" id="nu_msg"></div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // מפעיל את המצב השמור עוד לפני שהעמוד מצטייר, כדי שלא יהיה "הבזק" של המצב הלא נכון
+    const savedTheme = localStorage.getItem("pcf_theme") || "light";
+    document.documentElement.setAttribute("data-theme", savedTheme);
+  </script>
+
+  <!-- ===================== App shell ===================== -->
+  <div id="appShell" style="display:none;">
+    <div id="sidebarBackdrop" onclick="toggleSidebar(false)"></div>
+    <aside id="sidebar">
+      <div class="sidebar-logo">
+        <div class="mark"><i data-lucide="gem"></i></div>
+        <b>פניני חיזוק<br>כספים</b>
+      </div>
+      <nav class="sidebar-nav">
+        <button class="nav-item" data-tab="dashboard" onclick="showTab('dashboard')"><i data-lucide="layout-dashboard"></i>סקירה</button>
+
+        <div class="nav-group open" id="group-finance">
+          <button class="nav-group-head" onclick="toggleNavGroup('finance')"><i data-lucide="wallet"></i>כספים<i data-lucide="chevron-down" class="chev"></i></button>
+          <div class="nav-group-items">
+            <button class="nav-item" data-tab="expenses" onclick="showTab('expenses')"><i data-lucide="trending-down"></i>הוצאות</button>
+            <button class="nav-item" data-tab="incomes" onclick="showTab('incomes')"><i data-lucide="trending-up"></i>הכנסות</button>
+          </div>
+        </div>
+
+        <button class="nav-item" data-tab="debts" onclick="showTab('debts')"><i data-lucide="handshake"></i>חובות</button>
+
+        <div class="nav-group open" id="group-books">
+          <button class="nav-group-head" onclick="toggleNavGroup('books')"><i data-lucide="book-marked"></i>ספרים<i data-lucide="chevron-down" class="chev"></i></button>
+          <div class="nav-group-items">
+            <button class="nav-item" data-tab="inventory" onclick="showTab('inventory')"><i data-lucide="warehouse"></i>מלאי</button>
+            <button class="nav-item" data-tab="fills" onclick="showTab('fills')"><i data-lucide="package-plus"></i>מילוי מחסנים</button>
+            <button class="nav-item" data-tab="withdrawals" onclick="showTab('withdrawals')"><i data-lucide="package-minus"></i>משיכות</button>
+          </div>
+        </div>
+
+        <div class="sidebar-section-label">מערכת</div>
+        <button class="nav-item" data-tab="settings" onclick="showTab('settings')"><i data-lucide="settings"></i>הגדרות</button>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="avatar" id="sidebarAvatar">?</div>
+        <div class="who">
+          <div class="name" id="sidebarUserName">-</div>
+          <div class="role" id="sidebarUserRole">חשבון פעיל</div>
+        </div>
+        <button class="menu-btn" title="יציאה" onclick="logout()"><i data-lucide="log-out"></i></button>
+      </div>
+    </aside>
+
+    <div id="mainCol">
+      <header id="topHeader">
+        <div class="header-left">
+          <button id="hamburgerBtn" onclick="toggleSidebar(true)"><i data-lucide="menu"></i></button>
+          <div>
+            <div class="page-title" id="pageTitle">ראשי</div>
+            <div class="breadcrumb" id="pageBreadcrumb"></div>
+          </div>
+        </div>
+        <div class="header-right">
+          <input type="month" id="month" style="width:auto;padding:8px 10px;font-size:13px;">
+          <button class="icon-btn" id="installBtn" onclick="promptInstall()" title="התקן כאפליקציה" style="display:none;"><i data-lucide="download"></i></button>
+          <button class="icon-btn" id="themeToggleBtn" onclick="toggleTheme()" title="החלף מצב תצוגה"><i data-lucide="moon"></i></button>
+          <a href="#" onclick="openSheet();return false;" class="icon-btn" title="גיליון גיבוי"><i data-lucide="table-2"></i></a>
+        </div>
+      </header>
+
+      <div id="contentArea">
+        <div class="content-max" id="contentMax">
+          <!-- ===== סקירה / Dashboard ===== -->
+          <div id="panel-dashboard" class="panel">
+            <div style="margin-bottom:18px;">
+              <div class="page-title" style="font-size:20px;">ברוכים הבאים, <span id="welcomeName">-</span></div>
+              <div class="text-secondary" style="margin-top:4px;">סקירת מצב פניני חיזוק - כספים</div>
+            </div>
+
+            <div class="stat-grid">
+              <div class="stat-card" onclick="showTab('expenses')">
+                <div class="row1"><div class="card-title">הוצאות החודש</div><div class="stat-icon primary"><i data-lucide="trending-down"></i></div></div>
+                <div class="stat-value num" id="d_month_expenses">-</div>
+              </div>
+              <div class="stat-card" onclick="showTab('incomes')">
+                <div class="row1"><div class="card-title">הכנסות החודש</div><div class="stat-icon success"><i data-lucide="trending-up"></i></div></div>
+                <div class="stat-value num" id="d_month_incomes">-</div>
+              </div>
+              <div class="stat-card" onclick="showTab('expenses');setTimeout(()=>{document.getElementById('exp_status').value='unpaid';loadExpenses();},0)">
+                <div class="row1"><div class="card-title">הוצאות שלא שולמו</div><div class="stat-icon danger"><i data-lucide="clock"></i></div></div>
+                <div class="stat-value num" id="d_unpaid_expenses">-</div>
+              </div>
+              <div class="stat-card" onclick="showTab('inventory')">
+                <div class="row1"><div class="card-title">מלאי ספרים כולל</div><div class="stat-icon gold"><i data-lucide="book-marked"></i></div></div>
+                <div class="stat-value num" id="d_books_stock">-</div>
+              </div>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:22px;">
+              <div class="card" style="padding:18px 20px;cursor:pointer;" onclick="showTab('debts')">
+                <div class="row1" style="display:flex;justify-content:space-between;align-items:flex-start;">
+                  <div>
+                    <div class="card-title">חובות - פניני חיזוק חייבים</div>
+                    <div class="stat-value num" id="d_we_owe" style="margin-top:6px;">-</div>
+                  </div>
+                  <div class="stat-icon danger"><i data-lucide="arrow-up-right"></i></div>
+                </div>
+              </div>
+              <div class="card" style="padding:18px 20px;cursor:pointer;" onclick="showTab('debts')">
+                <div class="row1" style="display:flex;justify-content:space-between;align-items:flex-start;">
+                  <div>
+                    <div class="card-title">חובות - חייבים לפניני חיזוק</div>
+                    <div class="stat-value num" id="d_owed_to_us" style="margin-top:6px;">-</div>
+                  </div>
+                  <div class="stat-icon success"><i data-lucide="arrow-down-left"></i></div>
+                </div>
+              </div>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+              <div class="card" style="padding:20px;">
+                <div class="panel-head" style="margin-bottom:12px;"><h2 class="section-title" style="margin:0;">הוצאות אחרונות</h2><button class="btn btn-ghost btn-sm" onclick="showTab('expenses')">לכל ההוצאות <i data-lucide="chevron-left"></i></button></div>
+                <div id="recentExpenses"></div>
+              </div>
+              <div class="card" style="padding:20px;">
+                <div class="panel-head" style="margin-bottom:12px;"><h2 class="section-title" style="margin:0;">הכנסות אחרונות</h2><button class="btn btn-ghost btn-sm" onclick="showTab('incomes')">לכל ההכנסות <i data-lucide="chevron-left"></i></button></div>
+                <div id="recentIncomes"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ===== הוצאות ===== -->
+          <div id="panel-expenses" class="panel hidden">
+            <div class="panel-head">
+              <h2 class="section-title">הוצאות</h2>
+              <button class="action" onclick="openExpenseModal()"><i data-lucide="plus"></i>הוצאה חדשה</button>
+            </div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;">
+              <select id="exp_category" class="cat-select" onchange="loadTab('expenses')" style="min-width:140px;"><option value="">כל הקטגוריות</option></select>
+              <select id="exp_status" class="cat-select" onchange="loadTab('expenses')" style="min-width:140px;">
+                <option value="">כל הסטטוסים</option><option value="unpaid">לא שולם</option><option value="paid">שולם</option>
+              </select>
+            </div>
+            <div class="table-wrap">
+              <table class="data-table" id="t_expenses"><thead><tr>
+                <th>תאריך</th><th>קטגוריה</th><th>סכום</th><th>ספר</th><th>קבלה</th><th>סטטוס</th><th>הערות</th><th>נרשם ע"י</th><th></th>
+              </tr></thead><tbody></tbody></table>
+            </div>
+          </div>
+
+          <!-- ===== הכנסות ===== -->
+          <div id="panel-incomes" class="panel hidden">
+            <div class="panel-head">
+              <h2 class="section-title">הכנסות</h2>
+              <button class="action" onclick="openIncomeModal()"><i data-lucide="plus"></i>הכנסה חדשה</button>
+            </div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;">
+              <select id="inc_category" class="cat-select" onchange="loadTab('incomes')" style="min-width:140px;"><option value="">כל הקטגוריות</option></select>
+            </div>
+            <div class="table-wrap">
+              <table class="data-table" id="t_incomes"><thead><tr>
+                <th>תאריך</th><th>קטגוריה</th><th>סכום</th><th>ספר</th><th>הערות</th><th>נרשם ע"י</th><th></th>
+              </tr></thead><tbody></tbody></table>
+            </div>
+          </div>
+
+          <!-- ===== חובות ===== -->
+          <div id="panel-debts" class="panel hidden">
+            <div class="panel-head">
+              <h2 class="section-title">חובות</h2>
+              <button class="action" onclick="openDebtModal(currentDebtDirection)"><i data-lucide="plus"></i>חוב חדש</button>
+            </div>
+            <div class="direction-tabs">
+              <button class="btn" id="debtTab_we_owe" onclick="setDebtDirection('we_owe')">פניני חיזוק חייבים</button>
+              <button class="btn secondary" id="debtTab_owed_to_us" onclick="setDebtDirection('owed_to_us')">חייבים לפניני חיזוק</button>
+            </div>
+            <div class="table-wrap">
+              <table class="data-table" id="t_debts"><thead><tr>
+                <th id="debtNameHeader">למי</th><th>סכום</th><th>סיבה</th><th>תאריך</th><th>סטטוס</th><th>הערות</th><th></th>
+              </tr></thead><tbody></tbody></table>
+            </div>
+          </div>
+
+          <!-- ===== מלאי ===== -->
+          <div id="panel-inventory" class="panel hidden">
+            <div class="panel-head">
+              <h2 class="section-title">מלאי ספרים</h2>
+              <select id="inv_warehouse" onchange="loadTab('inventory')" style="min-width:180px;width:auto;"><option value="">כל המחסנים (סה"כ)</option></select>
+            </div>
+            <div class="inventory-grid" id="inventoryGrid"></div>
+          </div>
+
+          <!-- ===== מילוי מחסנים ===== -->
+          <div id="panel-fills" class="panel hidden">
+            <div class="panel-head">
+              <h2 class="section-title">מילוי מחסנים (הדפסות / הכנסת מלאי)</h2>
+              <button class="action" onclick="openFillModal()"><i data-lucide="plus"></i>מילוי חדש</button>
+            </div>
+            <div class="table-wrap">
+              <table class="data-table" id="t_fills"><thead><tr>
+                <th>תאריך</th><th>מחסן</th><th>פריטים</th><th>עלות כוללת</th><th>סט מלא</th><th>הערות</th><th></th>
+              </tr></thead><tbody></tbody></table>
+            </div>
+          </div>
+
+          <!-- ===== משיכות ===== -->
+          <div id="panel-withdrawals" class="panel hidden">
+            <div class="panel-head">
+              <h2 class="section-title">משיכות ספרים</h2>
+              <button class="action" onclick="openWithdrawalModal()"><i data-lucide="plus"></i>משיכה חדשה</button>
+            </div>
+            <div class="table-wrap">
+              <table class="data-table" id="t_withdrawals"><thead><tr>
+                <th>תאריך</th><th>מחסן</th><th>פריטים</th><th>סיבה</th><th>סט מלא</th><th>הערות</th><th></th>
+              </tr></thead><tbody></tbody></table>
+            </div>
+          </div>
+
+          <!-- ===== הגדרות ===== -->
+          <div id="panel-settings" class="panel hidden">
+            <div class="panel-head"><h2 class="section-title">הגדרות</h2></div>
+            <div class="tabs">
+              <button class="settings-subtab active" data-sub="profile" onclick="showSettingsSub('profile')"><i data-lucide="user"></i>פרופיל שלי</button>
+              <button class="settings-subtab" data-sub="categories" onclick="showSettingsSub('categories')"><i data-lucide="tag"></i>קטגוריות</button>
+              <button class="settings-subtab" data-sub="books" onclick="showSettingsSub('books')"><i data-lucide="book-marked"></i>ספרים ומהדורות</button>
+              <button class="settings-subtab" data-sub="warehouses" onclick="showSettingsSub('warehouses')"><i data-lucide="warehouse"></i>מחסנים</button>
+              <button class="settings-subtab" data-sub="sheet" onclick="showSettingsSub('sheet')"><i data-lucide="table-2"></i>גיליון גיבוי</button>
+            </div>
+
+            <div id="settingsSub-profile" class="settings-sub">
+              <form id="profileForm" class="grid-form" style="max-width:520px;">
+                <div class="field"><label>שם מלא</label><input type="text" id="pr_fullname"></div>
+                <div class="field"><label>תפקיד</label><input type="text" id="pr_role" placeholder="למשל: גזבר"></div>
+                <div class="field"><label>טלפון</label><input type="tel" id="pr_phone"></div>
+                <div class="field"><label>אימייל</label><input type="email" id="pr_email"></div>
+                <button class="action" type="submit"><i data-lucide="check"></i>שמור פרופיל</button>
+                <div class="msg" id="pr_msg"></div>
+              </form>
+            </div>
+
+            <div id="settingsSub-categories" class="settings-sub hidden">
+              <div style="max-width:520px;display:flex;flex-direction:column;gap:16px;">
+                <div class="field"><label>קטגוריות הוצאות (מופרדות בפסיק)</label><input type="text" id="cat_expenses"></div>
+                <div class="field"><label>קטגוריות הכנסות (מופרדות בפסיק)</label><input type="text" id="cat_incomes"></div>
+                <button class="action" style="width:fit-content;" onclick="saveCategoriesSettings()"><i data-lucide="check"></i>שמור קטגוריות</button>
+                <div class="msg" id="cat_msg"></div>
+              </div>
+            </div>
+
+            <div id="settingsSub-books" class="settings-sub hidden">
+              <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
+                <input type="text" id="newBookName" placeholder="שם ספר חדש" style="max-width:260px;">
+                <button class="btn secondary" onclick="addBook()"><i data-lucide="plus"></i>הוסף ספר</button>
+              </div>
+              <div id="booksManageList"></div>
+            </div>
+
+            <div id="settingsSub-warehouses" class="settings-sub hidden">
+              <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
+                <input type="text" id="newWarehouseName" placeholder="שם מחסן/נקודת מכירה חדשה" style="max-width:260px;">
+                <select id="newWarehouseType" style="max-width:180px;"><option value="warehouse">מחסן</option><option value="sales_point">נקודת מכירה</option></select>
+                <button class="btn secondary" onclick="addWarehouse()"><i data-lucide="plus"></i>הוסף מחסן</button>
+              </div>
+              <div class="table-wrap">
+                <table class="data-table" id="t_warehouses_manage"><thead><tr><th>שם</th><th>סוג</th><th>פעיל</th><th></th></tr></thead><tbody></tbody></table>
+              </div>
+            </div>
+
+            <div id="settingsSub-sheet" class="settings-sub hidden">
+              <p class="text-secondary" style="margin-bottom:14px;">כל הנתונים מסתנכרנים אוטומטית לגיליון גיבוי אחד משותף ב-Google Sheets בכל שינוי.</p>
+              <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+                <a href="#" onclick="openSheet();return false;" class="action"><i data-lucide="table-2"></i>פתח את הגיליון</a>
+                <button class="btn secondary" onclick="forceSyncSheet()"><i data-lucide="refresh-cw"></i>סנכרן עכשיו</button>
+              </div>
+              <p class="text-caption" style="margin-top:12px;" id="sheetSyncedAt"></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="previewModal" class="modal-overlay">
+    <div class="modal-box wide">
+      <div class="modal-header"><h2>תצוגה מקדימה</h2><button class="modal-close" onclick="closePreview()"><i data-lucide="x"></i></button></div>
+      <div class="modal-body" style="padding:0;">
+        <iframe id="previewFrame" src="" style="width:100%;height:70vh;border:none;display:block;"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== מודל הוצאה ===== -->
+  <div id="expenseModal" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-header"><h2 id="expenseModalTitle">הוצאה חדשה</h2><button class="modal-close" onclick="closeModal('expenseModal')"><i data-lucide="x"></i></button></div>
+      <form id="expenseForm">
+        <div class="modal-body">
+          <div class="grid-form" style="grid-template-columns:1fr 1fr;gap:12px;">
+            <div class="field"><label>תאריך</label><input type="date" id="e_date" required></div>
+            <div class="field"><label>סכום</label><input type="number" step="0.01" id="e_amount" required></div>
+            <div class="field full-width" style="grid-column:1/-1;"><label>קטגוריה</label><select id="e_category" onchange="onExpenseCategoryChange()" required></select></div>
+            <div class="field full-width hidden" id="e_bookField" style="grid-column:1/-1;"><label>ספר (אופציונלי)</label><select id="e_book_edition"></select></div>
+            <div class="field full-width" style="grid-column:1/-1;"><label>הערות</label><textarea id="e_notes" rows="2"></textarea></div>
+            <div class="field full-width" style="grid-column:1/-1;"><label>קבלה (קובץ, אופציונלי - יעלה לדרייב)</label><input type="file" id="e_file" accept="image/*,application/pdf"></div>
+            <div id="e_existingReceipt" class="text-caption full-width" style="grid-column:1/-1;"></div>
+            <div class="field full-width" style="grid-column:1/-1;">
+              <label>סטטוס</label>
+              <select id="e_status"><option value="unpaid">לא שולם</option><option value="paid">שולם</option></select>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="action" type="submit"><i data-lucide="check"></i>שמור</button>
+          <button class="action secondary" type="button" onclick="closeModal('expenseModal')">ביטול</button>
+        </div>
+        <div class="msg" id="e_msg" style="padding:0 22px 14px;"></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===== מודל הכנסה ===== -->
+  <div id="incomeModal" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-header"><h2 id="incomeModalTitle">הכנסה חדשה</h2><button class="modal-close" onclick="closeModal('incomeModal')"><i data-lucide="x"></i></button></div>
+      <form id="incomeForm">
+        <div class="modal-body">
+          <div class="grid-form" style="grid-template-columns:1fr 1fr;gap:12px;">
+            <div class="field"><label>תאריך</label><input type="date" id="i_date" required></div>
+            <div class="field"><label>סכום</label><input type="number" step="0.01" id="i_amount" required></div>
+            <div class="field full-width" style="grid-column:1/-1;"><label>קטגוריה</label><select id="i_category" onchange="onIncomeCategoryChange()" required></select></div>
+            <div class="field full-width hidden" id="i_bookField" style="grid-column:1/-1;"><label>ספר (אופציונלי)</label><select id="i_book_edition"></select></div>
+            <div class="field full-width" style="grid-column:1/-1;"><label>הערות</label><textarea id="i_notes" rows="2"></textarea></div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="action" type="submit"><i data-lucide="check"></i>שמור</button>
+          <button class="action secondary" type="button" onclick="closeModal('incomeModal')">ביטול</button>
+        </div>
+        <div class="msg" id="i_msg" style="padding:0 22px 14px;"></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===== מודל חוב ===== -->
+  <div id="debtModal" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-header"><h2 id="debtModalTitle">חוב חדש</h2><button class="modal-close" onclick="closeModal('debtModal')"><i data-lucide="x"></i></button></div>
+      <form id="debtForm">
+        <div class="modal-body">
+          <div class="grid-form" style="grid-template-columns:1fr 1fr;gap:12px;">
+            <div class="field full-width" style="grid-column:1/-1;"><label id="d_nameLabel">למי (שם)</label><input type="text" id="d_counterparty" required></div>
+            <div class="field"><label>סכום</label><input type="number" step="0.01" id="d_amount" required></div>
+            <div class="field"><label>תאריך</label><input type="date" id="d_date"></div>
+            <div class="field full-width" style="grid-column:1/-1;"><label>על מה / למה</label><input type="text" id="d_reason"></div>
+            <div class="field full-width" style="grid-column:1/-1;"><label>הערות</label><textarea id="d_notes" rows="2"></textarea></div>
+            <div class="field full-width" style="grid-column:1/-1;">
+              <label>סטטוס</label>
+              <select id="d_status"><option value="open">פתוח</option><option value="settled">סגור</option></select>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="action" type="submit"><i data-lucide="check"></i>שמור</button>
+          <button class="action secondary" type="button" onclick="closeModal('debtModal')">ביטול</button>
+        </div>
+        <div class="msg" id="d_msg" style="padding:0 22px 14px;"></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===== מודל מילוי מחסן ===== -->
+  <div id="fillModal" class="modal-overlay">
+    <div class="modal-box wide">
+      <div class="modal-header"><h2>מילוי מחסן חדש</h2><button class="modal-close" onclick="closeModal('fillModal')"><i data-lucide="x"></i></button></div>
+      <form id="fillForm">
+        <div class="modal-body">
+          <div class="grid-form" style="grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+            <div class="field"><label>תאריך</label><input type="date" id="f_date" required></div>
+            <div class="field"><label>מחסן</label><select id="f_warehouse" required></select></div>
+          </div>
+          <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
+            <button type="button" class="btn secondary btn-sm" onclick="fillAddRow()"><i data-lucide="plus"></i>הוסף ספר</button>
+            <button type="button" class="btn secondary btn-sm" onclick="fillFullSet()"><i data-lucide="layers"></i>סט מלא (כל הספרים)</button>
+          </div>
+          <div id="fillItemsRows" style="margin-bottom:12px;"></div>
+          <div class="field" style="margin-bottom:12px;"><label>הערות</label><textarea id="f_notes" rows="2"></textarea></div>
+          <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;">
+            <input type="checkbox" id="f_createExpense" checked>
+            ליצור אוטומטית הוצאת "הדפסה" (לא שולמה) על סכום העלות הכוללת שהוזנה
+          </label>
+        </div>
+        <div class="modal-footer">
+          <button class="action" type="submit"><i data-lucide="check"></i>שמור מילוי</button>
+          <button class="action secondary" type="button" onclick="closeModal('fillModal')">ביטול</button>
+        </div>
+        <div class="msg" id="f_msg" style="padding:0 22px 14px;"></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===== מודל משיכה ===== -->
+  <div id="withdrawalModal" class="modal-overlay">
+    <div class="modal-box wide">
+      <div class="modal-header"><h2>משיכה חדשה</h2><button class="modal-close" onclick="closeModal('withdrawalModal')"><i data-lucide="x"></i></button></div>
+      <form id="withdrawalForm">
+        <div class="modal-body">
+          <div class="grid-form" style="grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+            <div class="field"><label>תאריך</label><input type="date" id="w_date" required></div>
+            <div class="field"><label>מחסן</label><select id="w_warehouse" onchange="withdrawalRefreshStock()" required></select></div>
+          </div>
+          <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
+            <button type="button" class="btn secondary btn-sm" onclick="withdrawalAddRow()"><i data-lucide="plus"></i>הוסף ספר</button>
+            <button type="button" class="btn secondary btn-sm" onclick="withdrawalFullSet()"><i data-lucide="layers"></i>סט מלא (כל הספרים)</button>
+          </div>
+          <div id="withdrawalItemsRows" style="margin-bottom:12px;"></div>
+          <div class="field" style="margin-bottom:12px;"><label>סיבה / יעד</label><input type="text" id="w_reason" placeholder="למשל: חלוקה, מכירה, אירוע"></div>
+          <div class="field"><label>הערות</label><textarea id="w_notes" rows="2"></textarea></div>
+        </div>
+        <div class="modal-footer">
+          <button class="action" type="submit"><i data-lucide="check"></i>שמור משיכה</button>
+          <button class="action secondary" type="button" onclick="closeModal('withdrawalModal')">ביטול</button>
+        </div>
+        <div class="msg" id="w_msg" style="padding:0 22px 14px;"></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===== מודל סיכום ספר ===== -->
+  <div id="bookSummaryModal" class="modal-overlay">
+    <div class="modal-box wide">
+      <div class="modal-header"><h2 id="bs_title">סיכום ספר</h2><button class="modal-close" onclick="closeModal('bookSummaryModal')"><i data-lucide="x"></i></button></div>
+      <div class="modal-body" id="bs_body"></div>
+    </div>
+  </div>
+
+  <div id="toastHost"></div>
+
+  <script>
+    // ==== יעד ה-API - כתובת ה-Worker שנוצר ב-Cloudflare. אם משנים את שם ה-Worker, יש לעדכן כאן ====
+    const API_BASE = "https://peninei-chizuk-finances.meny85502.workers.dev";
+    let currentUser = null;
+    let pendingUsername = null;
+    let booksCache = [];       // [{id, name, editions:[{id, edition_label, sale_price, include_in_set}]}]
+    let warehousesCache = [];  // [{id, name, type}]
+    let settingsCache = { expense_categories: "עריכה,הדפסה,שונות", income_categories: "תרומות,מכירות,קופות ישיבה" };
+
+    function refreshIcons() { try { if (window.lucide) lucide.createIcons(); } catch (e) { /* לא קריטי */ } }
+    refreshIcons();
+
+    const TOAST_ICONS = { ok: "circle-check", err: "circle-x", info: "info" };
+    function showToast(text, type = "info") {
+      const host = document.getElementById("toastHost");
+      const el = document.createElement("div");
+      el.className = "toast " + (type === "ok" ? "ok" : type === "err" ? "err" : "");
+      el.innerHTML = `<i data-lucide="${TOAST_ICONS[type] || TOAST_ICONS.info}"></i><span>${text}</span>`;
+      host.appendChild(el);
+      refreshIcons();
+      setTimeout(() => { el.style.transition = "opacity .25s"; el.style.opacity = "0"; setTimeout(() => el.remove(), 250); }, 3800);
+    }
+    function emptyStateHTML({ icon = "inbox", title = "אין נתונים", text = "", actionLabel = "", actionFn = "" }) {
+      return `<div class="state-block"><div class="state-icon"><i data-lucide="${icon}"></i></div><h3>${title}</h3>${text ? `<p>${text}</p>` : ""}${actionLabel ? `<button class="action" onclick="${actionFn}">${actionLabel}</button>` : ""}</div>`;
+    }
+    function skeletonRows(tbodySelector, cols, rows = 4) {
+      const tbody = document.querySelector(tbodySelector);
+      if (!tbody) return;
+      tbody.innerHTML = Array.from({ length: rows }).map(() =>
+        `<tr class="skel-row">${Array.from({ length: cols }).map(() => `<td><div class="skel skel-line" style="width:${60 + Math.random() * 30}%;"></div></td>`).join("")}</tr>`
+      ).join("");
+    }
+    function fmtMoney(n) { return "₪" + Number(n || 0).toLocaleString("he-IL", { maximumFractionDigits: 0 }); }
+    function esc(s) { return (s ?? "").toString().replace(/[&<>"']/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c])); }
+
+    function openPreview(fileId) {
+      document.getElementById("previewFrame").src = `https://drive.google.com/file/d/${fileId}/preview`;
+      document.getElementById("previewModal").classList.add("show");
+    }
+    function closePreview() {
+      document.getElementById("previewModal").classList.remove("show");
+      document.getElementById("previewFrame").src = "";
+    }
+
+    function toggleSidebar(open) {
+      document.getElementById("sidebar").classList.toggle("open", open);
+      document.getElementById("sidebarBackdrop").classList.toggle("show", open);
+    }
+    function toggleNavGroup(name) {
+      document.getElementById("group-" + name).classList.toggle("open");
+    }
+
+    function toggleTheme() {
+      const current = document.documentElement.getAttribute("data-theme");
+      const next = current === "dark" ? "light" : "dark";
+      document.documentElement.setAttribute("data-theme", next);
+      localStorage.setItem("pcf_theme", next);
+      document.getElementById("themeToggleBtn").innerHTML = next === "dark" ? '<i data-lucide="sun"></i>' : '<i data-lucide="moon"></i>';
+      refreshIcons();
+    }
+
+    /* ===================== התקנה כאפליקציה (PWA) ===================== */
+    let deferredInstallPrompt = null;
+    window.addEventListener("beforeinstallprompt", (e) => {
+      e.preventDefault();
+      deferredInstallPrompt = e;
+      const btn = document.getElementById("installBtn");
+      if (btn) btn.style.display = "flex";
+    });
+    async function promptInstall() {
+      if (!deferredInstallPrompt) { showToast("האפליקציה כבר מותקנת, או שהדפדפן לא תומך בהתקנה ישירה מכאן", "info"); return; }
+      deferredInstallPrompt.prompt();
+      await deferredInstallPrompt.userChoice;
+      deferredInstallPrompt = null;
+      document.getElementById("installBtn").style.display = "none";
+    }
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("sw.js").catch(() => { /* לא קריטי אם נכשל */ });
+      });
+    }
+
+    /* ===================== התחברות ===================== */
+    async function loadUserList() {
+      try {
+        const res = await fetch(`${API_BASE}/api/users`);
+        const users = await res.json();
+        const div = document.getElementById("userList");
+        if (!Array.isArray(users) || users.length === 0) {
+          div.innerHTML = emptyStateHTML({ icon: "user-plus", title: "אין עדיין משתמשים", text: "צור את המשתמש הראשון כדי להתחיל." });
+          refreshIcons(); return;
+        }
+        div.innerHTML = users.map(u => `<button class="user-pick-btn" onclick="promptLogin('${esc(u.username)}')"><span class="avatar">${esc((u.full_name || u.username || "?").trim()[0] || "?")}</span><span>${esc(u.full_name || u.username)}</span></button>`).join("");
+        refreshIcons();
+      } catch (e) {
+        document.getElementById("userList").innerHTML = emptyStateHTML({ icon: "wifi-off", title: "לא ניתן להתחבר לשרת", text: "בדוק שכתובת ה-API בקוד נכונה, ושה-Worker פעיל." });
+        refreshIcons();
+      }
+    }
+    function promptLogin(username) {
+      pendingUsername = username;
+      document.getElementById("lp_username").textContent = username;
+      document.getElementById("lp_password").value = "";
+      document.getElementById("loginPrompt").style.display = "block";
+    }
+    async function doLogin() {
+      const password = document.getElementById("lp_password").value;
+      const msg = document.getElementById("lp_msg");
+      const res = await fetch(`${API_BASE}/api/users/login`, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username: pendingUsername, password }),
+      });
+      const data = await res.json();
+      if (!res.ok) { msg.className = "msg err"; msg.textContent = data.error; return; }
+      enterApp(data);
+    }
+    async function enterApp(data) {
+      currentUser = data;
+      localStorage.setItem("pcf_user", JSON.stringify(data));
+      document.getElementById("sidebarUserName").textContent = currentUser.full_name || currentUser.username;
+      document.getElementById("sidebarUserRole").textContent = currentUser.role || "חשבון פעיל";
+      document.getElementById("sidebarAvatar").textContent = (currentUser.full_name || currentUser.username || "?").trim()[0] || "?";
+      document.getElementById("loginScreen").style.display = "none";
+      document.getElementById("loginPrompt").style.display = "none";
+      document.getElementById("appShell").style.display = "flex";
+      await Promise.all([loadSettings(), loadBooks(), loadWarehouses()]);
+      showTab("dashboard");
+      refreshIcons();
+    }
+    document.getElementById("newUserForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const msg = document.getElementById("nu_msg");
+      const res = await fetch(`${API_BASE}/api/users`, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          full_name: document.getElementById("nu_fullname").value,
+          username: document.getElementById("nu_username").value,
+          password: document.getElementById("nu_password").value,
+          phone: document.getElementById("nu_phone").value,
+          email: document.getElementById("nu_email").value,
+          admin_password: document.getElementById("nu_admin").value,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) { msg.className = "msg err"; msg.textContent = data.error; return; }
+      msg.className = "msg ok"; msg.textContent = "המשתמש נוצר! אפשר להתחבר עכשיו.";
+      e.target.reset();
+      loadUserList();
+    });
+    function logout() {
+      localStorage.removeItem("pcf_user");
+      currentUser = null;
+      document.getElementById("appShell").style.display = "none";
+      document.getElementById("loginScreen").style.display = "flex";
+      loadUserList();
+    }
+    function tryAutoLogin() {
+      const saved = localStorage.getItem("pcf_user");
+      if (saved) { enterApp(JSON.parse(saved)); return true; }
+      return false;
+    }
+
+    const monthInput = document.getElementById("month");
+    monthInput.value = new Date().toISOString().slice(0,7);
+    monthInput.addEventListener("change", () => { const t = document.querySelector(".nav-item.active"); if (t) loadTab(t.dataset.tab); });
+
+    /* ===================== מודלים - כללי ===================== */
+    function closeModal(id) { document.getElementById(id).classList.remove("show"); }
+    function openModal(id) { document.getElementById(id).classList.add("show"); refreshIcons(); }
+
+    /* ===================== ניווט בין עמודים ===================== */
+    const PAGE_META = {
+      dashboard: { title: "סקירה", crumb: "" },
+      expenses: { title: "הוצאות", crumb: "כספים" },
+      incomes: { title: "הכנסות", crumb: "כספים" },
+      debts: { title: "חובות", crumb: "" },
+      inventory: { title: "מלאי", crumb: "ספרים" },
+      fills: { title: "מילוי מחסנים", crumb: "ספרים" },
+      withdrawals: { title: "משיכות", crumb: "ספרים" },
+      settings: { title: "הגדרות", crumb: "מערכת" },
+    };
+    function showTab(name) {
+      document.querySelectorAll(".content-max > .panel").forEach(p => p.classList.add("hidden"));
+      document.querySelectorAll(".nav-item").forEach(b => b.classList.remove("active"));
+      const panel = document.getElementById("panel-" + name);
+      if (panel) panel.classList.remove("hidden");
+      const btn = document.querySelector(`.nav-item[data-tab="${name}"]`);
+      if (btn) btn.classList.add("active");
+      const meta = PAGE_META[name] || { title: name, crumb: "" };
+      document.getElementById("pageTitle").textContent = meta.title;
+      document.getElementById("pageBreadcrumb").textContent = meta.crumb;
+      toggleSidebar(false);
+      loadTab(name);
+    }
+    function loadTab(name) {
+      if (name === "dashboard") loadDashboard();
+      else if (name === "expenses") loadExpenses();
+      else if (name === "incomes") loadIncomes();
+      else if (name === "debts") loadDebts();
+      else if (name === "inventory") loadInventory();
+      else if (name === "fills") loadFills();
+      else if (name === "withdrawals") loadWithdrawals();
+      else if (name === "settings") loadSettingsTab();
+    }
+
+    /* ===================== טעינת נתוני יסוד (ספרים / מחסנים / הגדרות) ===================== */
+    async function loadSettings() {
+      const res = await fetch(`${API_BASE}/api/settings`);
+      settingsCache = await res.json();
+      populateCategorySelect(document.getElementById("exp_category"), settingsCache.expense_categories, true);
+      populateCategorySelect(document.getElementById("e_category"), settingsCache.expense_categories, false);
+      populateCategorySelect(document.getElementById("inc_category"), settingsCache.income_categories, true);
+      populateCategorySelect(document.getElementById("i_category"), settingsCache.income_categories, false);
+    }
+    function populateCategorySelect(sel, csv, includeAll) {
+      if (!sel) return;
+      const cats = (csv || "").split(",").map(s => s.trim()).filter(Boolean);
+      sel.innerHTML = (includeAll ? `<option value="">כל הקטגוריות</option>` : `<option value="">-- בחר קטגוריה --</option>`)
+        + cats.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join("");
+    }
+
+    async function loadBooks() {
+      const res = await fetch(`${API_BASE}/api/books`);
+      booksCache = await res.json();
+      ["e_book_edition", "i_book_edition"].forEach(id => {
+        const sel = document.getElementById(id);
+        if (sel) sel.innerHTML = `<option value="">-- ללא --</option>` + bookEditionOptionsHTML(null, false);
+      });
+    }
+    function bookEditionOptionsHTML(selectedId, onlyInSet) {
+      let html = "";
+      booksCache.forEach(b => {
+        (b.editions || []).forEach(e => {
+          if (onlyInSet && !e.include_in_set) return;
+          const sel = String(e.id) === String(selectedId) ? "selected" : "";
+          html += `<option value="${e.id}" ${sel}>${esc(b.name)} (${esc(e.edition_label)})</option>`;
+        });
+      });
+      return html;
+    }
+    function editionLabelById(id) {
+      for (const b of booksCache) for (const e of (b.editions || [])) if (String(e.id) === String(id)) return `${b.name} (${e.edition_label})`;
+      return "-";
+    }
+
+    async function loadWarehouses() {
+      const res = await fetch(`${API_BASE}/api/warehouses`);
+      warehousesCache = await res.json();
+      const options = warehousesCache.map(w => `<option value="${w.id}">${esc(w.name)}${w.type === "sales_point" ? " (נקודת מכירה)" : ""}</option>`).join("");
+      ["f_warehouse", "w_warehouse"].forEach(id => { const sel = document.getElementById(id); if (sel) sel.innerHTML = options; });
+      const invSel = document.getElementById("inv_warehouse");
+      if (invSel) invSel.innerHTML = `<option value="">כל המחסנים (סה"כ)</option>` + options;
+    }
+    function warehouseNameById(id) {
+      const w = warehousesCache.find(w => String(w.id) === String(id));
+      return w ? w.name : "-";
+    }
+
+    /* ===================== דשבורד ===================== */
+    async function loadDashboard() {
+      document.getElementById("welcomeName").textContent = currentUser.full_name || currentUser.username;
+      const month = monthInput.value;
+      try {
+        const res = await fetch(`${API_BASE}/api/dashboard?month=${month}`);
+        const d = await res.json();
+        document.getElementById("d_month_expenses").textContent = fmtMoney(d.month_expenses.total);
+        document.getElementById("d_month_incomes").textContent = fmtMoney(d.month_incomes.total);
+        document.getElementById("d_unpaid_expenses").textContent = fmtMoney(d.unpaid_expenses.total);
+        document.getElementById("d_books_stock").textContent = Number(d.books_total_stock || 0).toLocaleString("he-IL");
+        document.getElementById("d_we_owe").textContent = fmtMoney(d.debts_we_owe.total);
+        document.getElementById("d_owed_to_us").textContent = fmtMoney(d.debts_owed_to_us.total);
+      } catch (e) { showToast("שגיאה בטעינת הדשבורד: " + e.message, "err"); }
+
+      try {
+        const res = await fetch(`${API_BASE}/api/expenses?limit=5`);
+        const rows = await res.json();
+        document.getElementById("recentExpenses").innerHTML = rows.length
+          ? rows.map(r => `<div style="display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border);font-size:13px;">
+              <span>${esc(r.date)} · ${esc(r.category)}</span><b class="num">${fmtMoney(r.amount)}</b></div>`).join("")
+          : emptyStateHTML({ icon: "inbox", title: "אין הוצאות עדיין" });
+        refreshIcons();
+      } catch (e) { /* לא קריטי */ }
+
+      try {
+        const res = await fetch(`${API_BASE}/api/incomes?limit=5`);
+        const rows = await res.json();
+        document.getElementById("recentIncomes").innerHTML = rows.length
+          ? rows.map(r => `<div style="display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border);font-size:13px;">
+              <span>${esc(r.date)} · ${esc(r.category)}</span><b class="num">${fmtMoney(r.amount)}</b></div>`).join("")
+          : emptyStateHTML({ icon: "inbox", title: "אין הכנסות עדיין" });
+        refreshIcons();
+      } catch (e) { /* לא קריטי */ }
+    }
+
+    /* ===================== הוצאות ===================== */
+    let expensesCacheById = {};
+    async function loadExpenses() {
+      skeletonRows("#t_expenses tbody", 9);
+      const month = monthInput.value, category = document.getElementById("exp_category").value, status = document.getElementById("exp_status").value;
+      const params = new URLSearchParams({ month });
+      if (category) params.set("category", category);
+      if (status) params.set("status", status);
+      const res = await fetch(`${API_BASE}/api/expenses?${params}`);
+      const rows = await res.json();
+      expensesCacheById = {}; rows.forEach(r => expensesCacheById[r.id] = r);
+      const tbody = document.querySelector("#t_expenses tbody");
+      if (!rows.length) { tbody.innerHTML = `<tr><td colspan="9">${emptyStateHTML({ icon: "receipt", title: "אין הוצאות בחודש הזה" })}</td></tr>`; refreshIcons(); return; }
+      tbody.innerHTML = rows.map(r => `<tr>
+        <td data-label="תאריך">${esc(r.date)}</td>
+        <td data-label="קטגוריה"><span class="badge badge-neutral">${esc(r.category)}</span></td>
+        <td data-label="סכום" class="num-cell">${fmtMoney(r.amount)}</td>
+        <td data-label="ספר">${r.book_name ? esc(r.book_name + " (" + r.edition_label + ")") : "-"}</td>
+        <td data-label="קבלה">${r.drive_file_id ? `<button class="btn btn-secondary btn-sm" onclick="openPreview('${r.drive_file_id}')"><i data-lucide="file-text"></i>קבלה</button>` : `<button class="btn btn-secondary btn-sm" onclick="attachExpenseReceipt(${r.id})"><i data-lucide="upload"></i>העלה</button>`}</td>
+        <td data-label="סטטוס">${r.status === "paid" ? '<span class="badge badge-success"><i data-lucide="badge-check"></i>שולם</span>' : '<span class="badge badge-warning"><i data-lucide="clock"></i>לא שולם</span>'}</td>
+        <td data-label="הערות">${esc(r.notes || "")}</td>
+        <td data-label="נרשם ע\\"י">${esc(r.created_by_name || "-")}</td>
+        <td style="display:flex;gap:6px;">
+          <button class="btn btn-icon btn-secondary" title="ערוך" onclick="openExpenseModal(${r.id})"><i data-lucide="pencil"></i></button>
+          <button class="btn btn-icon btn-secondary" title="${r.status === "paid" ? "סמן כלא שולם" : "סמן כשולם"}" onclick="toggleExpensePaid(${r.id})"><i data-lucide="${r.status === "paid" ? "rotate-ccw" : "badge-check"}"></i></button>
+          <button class="btn btn-icon btn-secondary" style="color:var(--color-danger-text);" title="מחק" onclick="deleteExpense(${r.id})"><i data-lucide="trash-2"></i></button>
+        </td>
+      </tr>`).join("");
+      refreshIcons();
+    }
+    function onExpenseCategoryChange() {
+      document.getElementById("e_bookField").classList.toggle("hidden", document.getElementById("e_category").value !== "הדפסה");
+    }
+    function openExpenseModal(id) {
+      document.getElementById("expenseForm").reset();
+      document.getElementById("e_existingReceipt").textContent = "";
+      document.getElementById("expenseForm").dataset.id = id || "";
+      document.getElementById("expenseModalTitle").textContent = id ? "עריכת הוצאה" : "הוצאה חדשה";
+      if (id && expensesCacheById[id]) {
+        const r = expensesCacheById[id];
+        document.getElementById("e_date").value = r.date; document.getElementById("e_amount").value = r.amount;
+        document.getElementById("e_category").value = r.category; document.getElementById("e_notes").value = r.notes || "";
+        document.getElementById("e_status").value = r.status; document.getElementById("e_book_edition").value = r.book_edition_id || "";
+        if (r.drive_file_id) document.getElementById("e_existingReceipt").textContent = "יש כבר קבלה מצורפת - העלאת קובץ חדש תחליף אותה בהמשך דרך 'העלה' בטבלה.";
+      } else {
+        document.getElementById("e_date").value = todayStrLocal(); document.getElementById("e_status").value = "unpaid";
+      }
+      onExpenseCategoryChange();
+      openModal("expenseModal");
+    }
+    function todayStrLocal() { return new Date().toISOString().slice(0, 10); }
+    document.getElementById("expenseForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const id = e.target.dataset.id;
+      const msg = document.getElementById("e_msg");
+      const fields = {
+        date: document.getElementById("e_date").value, category: document.getElementById("e_category").value,
+        amount: document.getElementById("e_amount").value, notes: document.getElementById("e_notes").value,
+        book_edition_id: document.getElementById("e_book_edition").value, status: document.getElementById("e_status").value,
+        created_by: currentUser.id,
+      };
+      try {
+        let res;
+        if (id) {
+          res = await fetch(`${API_BASE}/api/expenses/${id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(fields) });
+        } else {
+          const file = document.getElementById("e_file").files[0];
+          if (file) {
+            const fd = new FormData();
+            Object.entries(fields).forEach(([k, v]) => fd.append(k, v));
+            fd.append("file", file);
+            res = await fetch(`${API_BASE}/api/expenses`, { method: "POST", body: fd });
+          } else {
+            res = await fetch(`${API_BASE}/api/expenses`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(fields) });
+          }
+        }
+        if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || "השרת דחה את הבקשה");
+        closeModal("expenseModal"); showToast("ההוצאה נשמרה", "ok"); loadExpenses(); loadDashboard();
+      } catch (err) { msg.className = "msg err"; msg.textContent = err.message; }
+    });
+    async function attachExpenseReceipt(id) {
+      const input = document.createElement("input"); input.type = "file"; input.accept = "image/*,application/pdf";
+      input.onchange = async () => {
+        const file = input.files[0]; if (!file) return;
+        const fd = new FormData(); fd.append("file", file);
+        try {
+          const res = await fetch(`${API_BASE}/api/expenses/${id}/attach`, { method: "POST", body: fd });
+          if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || "השרת דחה את ההעלאה");
+          showToast("הקבלה הועלתה לדרייב", "ok"); loadExpenses();
+        } catch (err) { showToast("שגיאה בהעלאה: " + err.message, "err"); }
+      };
+      input.click();
+    }
+    async function toggleExpensePaid(id) {
+      const r = expensesCacheById[id]; if (!r) return;
+      const newStatus = r.status === "paid" ? "unpaid" : "paid";
+      try {
+        const res = await fetch(`${API_BASE}/api/expenses/${id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status: newStatus }) });
+        if (!res.ok) throw new Error("השרת דחה את השינוי");
+        showToast("הסטטוס עודכן", "ok"); loadExpenses(); loadDashboard();
+      } catch (err) { showToast("שגיאה: " + err.message, "err"); }
+    }
+    async function deleteExpense(id) {
+      if (!confirm("למחוק את ההוצאה הזו? (גם הקבלה בדרייב תועבר לפח)")) return;
+      try {
+        const res = await fetch(`${API_BASE}/api/expenses/${id}`, { method: "DELETE" });
+        if (!res.ok) throw new Error("השרת דחה את המחיקה");
+        showToast("ההוצאה נמחקה", "ok"); loadExpenses(); loadDashboard();
+      } catch (err) { showToast("שגיאה: " + err.message, "err"); }
+    }
+
+    /* ===================== הכנסות ===================== */
+    let incomesCacheById = {};
+    async function loadIncomes() {
+      skeletonRows("#t_incomes tbody", 6);
+      const month = monthInput.value, category = document.getElementById("inc_category").value;
+      const params = new URLSearchParams({ month });
+      if (category) params.set("category", category);
+      const res = await fetch(`${API_BASE}/api/incomes?${params}`);
+      const rows = await res.json();
+      incomesCacheById = {}; rows.forEach(r => incomesCacheById[r.id] = r);
+      const tbody = document.querySelector("#t_incomes tbody");
+      if (!rows.length) { tbody.innerHTML = `<tr><td colspan="6">${emptyStateHTML({ icon: "hand-coins", title: "אין הכנסות בחודש הזה" })}</td></tr>`; refreshIcons(); return; }
+      tbody.innerHTML = rows.map(r => `<tr>
+        <td data-label="תאריך">${esc(r.date)}</td>
+        <td data-label="קטגוריה"><span class="badge badge-neutral">${esc(r.category)}</span></td>
+        <td data-label="סכום" class="num-cell">${fmtMoney(r.amount)}</td>
+        <td data-label="ספר">${r.book_name ? esc(r.book_name + " (" + r.edition_label + ")") : "-"}</td>
+        <td data-label="הערות">${esc(r.notes || "")}</td>
+        <td style="display:flex;gap:6px;">
+          <button class="btn btn-icon btn-secondary" title="ערוך" onclick="openIncomeModal(${r.id})"><i data-lucide="pencil"></i></button>
+          <button class="btn btn-icon btn-secondary" style="color:var(--color-danger-text);" title="מחק" onclick="deleteIncome(${r.id})"><i data-lucide="trash-2"></i></button>
+        </td>
+      </tr>`).join("");
+      refreshIcons();
+    }
+    function onIncomeCategoryChange() {
+      document.getElementById("i_bookField").classList.toggle("hidden", document.getElementById("i_category").value !== "מכירות");
+    }
+    function openIncomeModal(id) {
+      document.getElementById("incomeForm").reset();
+      document.getElementById("incomeForm").dataset.id = id || "";
+      document.getElementById("incomeModalTitle").textContent = id ? "עריכת הכנסה" : "הכנסה חדשה";
+      if (id && incomesCacheById[id]) {
+        const r = incomesCacheById[id];
+        document.getElementById("i_date").value = r.date; document.getElementById("i_amount").value = r.amount;
+        document.getElementById("i_category").value = r.category; document.getElementById("i_notes").value = r.notes || "";
+        document.getElementById("i_book_edition").value = r.book_edition_id || "";
+      } else { document.getElementById("i_date").value = todayStrLocal(); }
+      onIncomeCategoryChange();
+      openModal("incomeModal");
+    }
+    document.getElementById("incomeForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const id = e.target.dataset.id;
+      const msg = document.getElementById("i_msg");
+      const fields = {
+        date: document.getElementById("i_date").value, category: document.getElementById("i_category").value,
+        amount: document.getElementById("i_amount").value, notes: document.getElementById("i_notes").value,
+        book_edition_id: document.getElementById("i_book_edition").value, created_by: currentUser.id,
+      };
+      try {
+        const res = await fetch(`${API_BASE}/api/incomes${id ? "/" + id : ""}`, {
+          method: id ? "PATCH" : "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(fields),
+        });
+        if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || "השרת דחה את הבקשה");
+        closeModal("incomeModal"); showToast("ההכנסה נשמרה", "ok"); loadIncomes(); loadDashboard();
+      } catch (err) { msg.className = "msg err"; msg.textContent = err.message; }
+    });
+    async function deleteIncome(id) {
+      if (!confirm("למחוק את ההכנסה הזו?")) return;
+      try {
+        const res = await fetch(`${API_BASE}/api/incomes/${id}`, { method: "DELETE" });
+        if (!res.ok) throw new Error("השרת דחה את המחיקה");
+        showToast("ההכנסה נמחקה", "ok"); loadIncomes(); loadDashboard();
+      } catch (err) { showToast("שגיאה: " + err.message, "err"); }
+    }
+
+    /* ===================== חובות ===================== */
+    let currentDebtDirection = "we_owe";
+    let debtsCacheById = {};
+    function setDebtDirection(dir) {
+      currentDebtDirection = dir;
+      document.getElementById("debtTab_we_owe").className = dir === "we_owe" ? "btn" : "btn secondary";
+      document.getElementById("debtTab_owed_to_us").className = dir === "owed_to_us" ? "btn" : "btn secondary";
+      document.getElementById("debtNameHeader").textContent = dir === "we_owe" ? "למי" : "ממי";
+      loadDebts();
+    }
+    async function loadDebts() {
+      skeletonRows("#t_debts tbody", 7);
+      const res = await fetch(`${API_BASE}/api/debts?direction=${currentDebtDirection}`);
+      const rows = await res.json();
+      debtsCacheById = {}; rows.forEach(r => debtsCacheById[r.id] = r);
+      const tbody = document.querySelector("#t_debts tbody");
+      if (!rows.length) { tbody.innerHTML = `<tr><td colspan="7">${emptyStateHTML({ icon: "handshake", title: "אין חובות ברשימה הזו" })}</td></tr>`; refreshIcons(); return; }
+      tbody.innerHTML = rows.map(r => `<tr>
+        <td data-label="שם">${esc(r.counterparty_name)}</td>
+        <td data-label="סכום" class="num-cell">${fmtMoney(r.amount)}</td>
+        <td data-label="סיבה">${esc(r.reason || "")}</td>
+        <td data-label="תאריך">${esc(r.date || "")}</td>
+        <td data-label="סטטוס">${r.status === "settled" ? '<span class="badge badge-success">סגור</span>' : '<span class="badge badge-warning">פתוח</span>'}</td>
+        <td data-label="הערות">${esc(r.notes || "")}</td>
+        <td style="display:flex;gap:6px;">
+          <button class="btn btn-icon btn-secondary" title="ערוך" onclick="openDebtModal('${r.direction}', ${r.id})"><i data-lucide="pencil"></i></button>
+          <button class="btn btn-icon btn-secondary" title="${r.status === "settled" ? "פתח מחדש" : "סמן כסגור"}" onclick="toggleDebtSettled(${r.id})"><i data-lucide="${r.status === "settled" ? "rotate-ccw" : "check"}"></i></button>
+          <button class="btn btn-icon btn-secondary" style="color:var(--color-danger-text);" title="מחק" onclick="deleteDebt(${r.id})"><i data-lucide="trash-2"></i></button>
+        </td>
+      </tr>`).join("");
+      refreshIcons();
+    }
+    function openDebtModal(direction, id) {
+      document.getElementById("debtForm").reset();
+      document.getElementById("debtForm").dataset.id = id || "";
+      document.getElementById("debtForm").dataset.direction = direction;
+      document.getElementById("debtModalTitle").textContent = id ? "עריכת חוב" : (direction === "we_owe" ? "חוב חדש - פניני חיזוק חייבים" : "חוב חדש - חייבים לפניני חיזוק");
+      document.getElementById("d_nameLabel").textContent = direction === "we_owe" ? "למי (שם)" : "ממי (שם)";
+      if (id && debtsCacheById[id]) {
+        const r = debtsCacheById[id];
+        document.getElementById("d_counterparty").value = r.counterparty_name; document.getElementById("d_amount").value = r.amount;
+        document.getElementById("d_date").value = r.date || ""; document.getElementById("d_reason").value = r.reason || "";
+        document.getElementById("d_notes").value = r.notes || ""; document.getElementById("d_status").value = r.status;
+      } else { document.getElementById("d_date").value = todayStrLocal(); }
+      openModal("debtModal");
+    }
+    document.getElementById("debtForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const id = e.target.dataset.id; const direction = e.target.dataset.direction;
+      const msg = document.getElementById("d_msg");
+      const fields = {
+        direction, counterparty_name: document.getElementById("d_counterparty").value, amount: document.getElementById("d_amount").value,
+        date: document.getElementById("d_date").value, reason: document.getElementById("d_reason").value,
+        notes: document.getElementById("d_notes").value, status: document.getElementById("d_status").value, created_by: currentUser.id,
+      };
+      try {
+        const res = await fetch(`${API_BASE}/api/debts${id ? "/" + id : ""}`, {
+          method: id ? "PATCH" : "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(fields),
+        });
+        if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || "השרת דחה את הבקשה");
+        closeModal("debtModal"); showToast("החוב נשמר", "ok"); loadDebts(); loadDashboard();
+      } catch (err) { msg.className = "msg err"; msg.textContent = err.message; }
+    });
+    async function toggleDebtSettled(id) {
+      const r = debtsCacheById[id]; if (!r) return;
+      const newStatus = r.status === "settled" ? "open" : "settled";
+      await fetch(`${API_BASE}/api/debts/${id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status: newStatus }) });
+      showToast("הסטטוס עודכן", "ok"); loadDebts(); loadDashboard();
+    }
+    async function deleteDebt(id) {
+      if (!confirm("למחוק את החוב הזה?")) return;
+      await fetch(`${API_BASE}/api/debts/${id}`, { method: "DELETE" });
+      showToast("החוב נמחק", "ok"); loadDebts(); loadDashboard();
+    }
+
+    /* ===================== מלאי ===================== */
+    async function loadInventory() {
+      const grid = document.getElementById("inventoryGrid");
+      grid.innerHTML = "";
+      const res = await fetch(`${API_BASE}/api/inventory`);
+      const rows = await res.json();
+      const warehouseFilter = document.getElementById("inv_warehouse").value;
+      let display;
+      if (warehouseFilter) {
+        display = rows.filter(r => String(r.warehouse_id) === String(warehouseFilter));
+      } else {
+        const byEdition = {};
+        rows.forEach(r => {
+          if (!byEdition[r.book_edition_id]) byEdition[r.book_edition_id] = { book_edition_id: r.book_edition_id, book_name: r.book_name, edition_label: r.edition_label, quantity: 0 };
+          byEdition[r.book_edition_id].quantity += r.quantity;
+        });
+        display = Object.values(byEdition);
+      }
+      if (!display.length) { grid.innerHTML = emptyStateHTML({ icon: "warehouse", title: "אין נתוני מלאי עדיין" }); refreshIcons(); return; }
+      grid.innerHTML = display.map(r => `<div class="inv-card" onclick="openBookSummary(${r.book_edition_id})">
+        <div class="inv-book">${esc(r.book_name)}</div>
+        <div class="inv-edition">${esc(r.edition_label)}${warehouseFilter ? "" : " · כל המחסנים"}</div>
+        <div class="inv-qty ${r.quantity <= 0 ? "inv-low" : ""}">${r.quantity}</div>
+      </div>`).join("");
+      refreshIcons();
+    }
+    async function openBookSummary(editionId) {
+      document.getElementById("bs_title").textContent = editionLabelById(editionId);
+      document.getElementById("bs_body").innerHTML = `<div class="skel skel-line" style="height:120px;"></div>`;
+      openModal("bookSummaryModal");
+      const res = await fetch(`${API_BASE}/api/book-editions/${editionId}/summary`);
+      const s = await res.json();
+      document.getElementById("bs_body").innerHTML = `
+        <div class="stat-grid" style="grid-template-columns:repeat(2,1fr);margin-bottom:18px;">
+          <div class="stat-card" style="cursor:default;"><div class="card-title">במלאי כרגע</div><div class="stat-value">${s.current_stock}</div></div>
+          <div class="stat-card" style="cursor:default;"><div class="card-title">הודפסו סה"כ</div><div class="stat-value">${s.total_printed}</div></div>
+          <div class="stat-card" style="cursor:default;"><div class="card-title">נמשכו סה"כ</div><div class="stat-value">${s.total_withdrawn}</div></div>
+          <div class="stat-card" style="cursor:default;"><div class="card-title">עלות הדפסה כוללת</div><div class="stat-value">${fmtMoney(s.total_print_cost)}</div></div>
+        </div>
+        <h3 class="section-title">פירוט לפי מחסן</h3>
+        <div class="table-wrap" style="margin-bottom:18px;"><table class="data-table"><thead><tr><th>מחסן</th><th>כמות</th></tr></thead>
+          <tbody>${s.by_warehouse.map(w => `<tr><td>${esc(w.warehouse_name)}</td><td class="num-cell">${w.quantity}</td></tr>`).join("")}</tbody></table></div>
+        <h3 class="section-title">כספים על הספר הזה</h3>
+        <div class="table-wrap"><table class="data-table"><tbody>
+          <tr><td>סה"כ הוצאות (הדפסה וכו')</td><td class="num-cell">${fmtMoney(s.expenses_total.total)} (${s.expenses_total.count})</td></tr>
+          <tr><td>מתוכן לא שולמו</td><td class="num-cell">${fmtMoney(s.expenses_unpaid.total)} (${s.expenses_unpaid.count})</td></tr>
+          <tr><td>סה"כ הכנסות (מכירות וכו')</td><td class="num-cell">${fmtMoney(s.income_total.total)} (${s.income_total.count})</td></tr>
+        </tbody></table></div>`;
+      refreshIcons();
+    }
+
+    /* ===================== מילוי מחסנים ===================== */
+    let fillItems = [];
+    function fillAddRow() { fillItems.push({ book_edition_id: "", quantity: 1, unit_cost: "" }); renderFillItemsRows(); }
+    function fillFullSet() {
+      fillItems = [];
+      booksCache.forEach(b => (b.editions || []).forEach(e => { if (e.include_in_set) fillItems.push({ book_edition_id: String(e.id), quantity: 1, unit_cost: "" }); }));
+      document.getElementById("f_isFullSet_flag").value = "1";
+      renderFillItemsRows();
+    }
+    function fillRemoveRow(idx) { fillItems.splice(idx, 1); renderFillItemsRows(); }
+    function renderFillItemsRows() {
+      const div = document.getElementById("fillItemsRows");
+      if (!fillItems.length) { div.innerHTML = `<p class="text-caption">לא נוספו ספרים - השתמש בכפתורים למעלה.</p>`; return; }
+      div.innerHTML = fillItems.map((it, idx) => `<div class="set-item-row">
+        <select class="si-book" onchange="fillItems[${idx}].book_edition_id=this.value">${bookEditionOptionsHTML(it.book_edition_id, false)}</select>
+        <input class="si-num" type="number" min="1" value="${it.quantity}" placeholder="כמות" oninput="fillItems[${idx}].quantity=this.value">
+        <input class="si-num" type="number" step="0.01" value="${it.unit_cost}" placeholder="עלות ליחידה" oninput="fillItems[${idx}].unit_cost=this.value">
+        <button type="button" class="btn btn-icon btn-secondary si-remove" onclick="fillRemoveRow(${idx})"><i data-lucide="x"></i></button>
+      </div>`).join("");
+      refreshIcons();
+    }
+    function openFillModal() {
+      document.getElementById("fillForm").reset();
+      document.getElementById("f_date").value = todayStrLocal();
+      fillItems = [];
+      const hidden = document.getElementById("f_isFullSet_flag") || (() => { const i = document.createElement("input"); i.type = "hidden"; i.id = "f_isFullSet_flag"; document.getElementById("fillForm").appendChild(i); return i; })();
+      hidden.value = "0";
+      renderFillItemsRows();
+      openModal("fillModal");
+    }
+    document.getElementById("fillForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const msg = document.getElementById("f_msg");
+      const items = fillItems.filter(it => it.book_edition_id && it.quantity);
+      if (!items.length) { msg.className = "msg err"; msg.textContent = "יש להוסיף לפחות ספר אחד עם כמות"; return; }
+      const body = {
+        date: document.getElementById("f_date").value, warehouse_id: document.getElementById("f_warehouse").value,
+        is_full_set: document.getElementById("f_isFullSet_flag").value === "1", notes: document.getElementById("f_notes").value,
+        items, create_expense: document.getElementById("f_createExpense").checked, created_by: currentUser.id,
+      };
+      try {
+        const res = await fetch(`${API_BASE}/api/book-fills`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+        if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || "השרת דחה את הבקשה");
+        closeModal("fillModal"); showToast("המילוי נשמר", "ok"); loadFills(); loadDashboard();
+      } catch (err) { msg.className = "msg err"; msg.textContent = err.message; }
+    });
+    async function loadFills() {
+      skeletonRows("#t_fills tbody", 7);
+      const res = await fetch(`${API_BASE}/api/book-fills`);
+      const rows = await res.json();
+      const tbody = document.querySelector("#t_fills tbody");
+      if (!rows.length) { tbody.innerHTML = `<tr><td colspan="7">${emptyStateHTML({ icon: "package-plus", title: "אין עדיין מילויים רשומים" })}</td></tr>`; refreshIcons(); return; }
+      tbody.innerHTML = rows.map(f => `<tr>
+        <td data-label="תאריך">${esc(f.date)}</td>
+        <td data-label="מחסן">${esc(f.warehouse_name)}</td>
+        <td data-label="פריטים">${f.items.map(it => `${esc(it.book_name)} (${esc(it.edition_label)}) x${it.quantity}`).join("<br>")}</td>
+        <td data-label="עלות כוללת" class="num-cell">${fmtMoney(f.items.reduce((s, it) => s + (it.total_cost || 0), 0))}</td>
+        <td data-label="סט מלא">${f.is_full_set ? '<span class="badge badge-gold">כן</span>' : "-"}</td>
+        <td data-label="הערות">${esc(f.notes || "")}</td>
+        <td><button class="btn btn-icon btn-secondary" style="color:var(--color-danger-text);" title="מחק" onclick="deleteFill(${f.id})"><i data-lucide="trash-2"></i></button></td>
+      </tr>`).join("");
+      refreshIcons();
+    }
+    async function deleteFill(id) {
+      if (!confirm("למחוק את רשומת המילוי הזו? זה יקטין את המלאי בהתאם (ההוצאה שנוצרה, אם היתה, תישאר).")) return;
+      await fetch(`${API_BASE}/api/book-fills/${id}`, { method: "DELETE" });
+      showToast("המילוי נמחק", "ok"); loadFills(); loadInventory(); loadDashboard();
+    }
+
+    /* ===================== משיכות ===================== */
+    let withdrawalItems = [];
+    let withdrawalStockMap = {};
+    async function withdrawalRefreshStock() {
+      const warehouseId = document.getElementById("w_warehouse").value;
+      if (!warehouseId) { withdrawalStockMap = {}; renderWithdrawalItemsRows(); return; }
+      const res = await fetch(`${API_BASE}/api/inventory`);
+      const rows = await res.json();
+      withdrawalStockMap = {};
+      rows.filter(r => String(r.warehouse_id) === String(warehouseId)).forEach(r => withdrawalStockMap[r.book_edition_id] = r.quantity);
+      renderWithdrawalItemsRows();
+    }
+    function withdrawalAddRow() { withdrawalItems.push({ book_edition_id: "", quantity: 1 }); renderWithdrawalItemsRows(); }
+    function withdrawalFullSet() {
+      withdrawalItems = [];
+      booksCache.forEach(b => (b.editions || []).forEach(e => { if (e.include_in_set) withdrawalItems.push({ book_edition_id: String(e.id), quantity: 1 }); }));
+      document.getElementById("w_isFullSet_flag").value = "1";
+      renderWithdrawalItemsRows();
+    }
+    function withdrawalRemoveRow(idx) { withdrawalItems.splice(idx, 1); renderWithdrawalItemsRows(); }
+    function renderWithdrawalItemsRows() {
+      const div = document.getElementById("withdrawalItemsRows");
+      if (!withdrawalItems.length) { div.innerHTML = `<p class="text-caption">לא נוספו ספרים - השתמש בכפתורים למעלה.</p>`; return; }
+      div.innerHTML = withdrawalItems.map((it, idx) => {
+        const stock = withdrawalStockMap[it.book_edition_id];
+        return `<div class="set-item-row">
+          <select class="si-book" onchange="withdrawalItems[${idx}].book_edition_id=this.value;renderWithdrawalItemsRows();">${bookEditionOptionsHTML(it.book_edition_id, false)}</select>
+          <input class="si-num" type="number" min="1" value="${it.quantity}" placeholder="כמות" oninput="withdrawalItems[${idx}].quantity=this.value">
+          <span class="si-stock">${stock !== undefined ? `במלאי: ${stock}` : ""}</span>
+          <button type="button" class="btn btn-icon btn-secondary si-remove" onclick="withdrawalRemoveRow(${idx})"><i data-lucide="x"></i></button>
+        </div>`;
+      }).join("");
+      refreshIcons();
+    }
+    function openWithdrawalModal() {
+      document.getElementById("withdrawalForm").reset();
+      document.getElementById("w_date").value = todayStrLocal();
+      withdrawalItems = []; withdrawalStockMap = {};
+      const hidden = document.getElementById("w_isFullSet_flag") || (() => { const i = document.createElement("input"); i.type = "hidden"; i.id = "w_isFullSet_flag"; document.getElementById("withdrawalForm").appendChild(i); return i; })();
+      hidden.value = "0";
+      renderWithdrawalItemsRows();
+      openModal("withdrawalModal");
+      withdrawalRefreshStock();
+    }
+    document.getElementById("withdrawalForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const msg = document.getElementById("w_msg");
+      const items = withdrawalItems.filter(it => it.book_edition_id && it.quantity);
+      if (!items.length) { msg.className = "msg err"; msg.textContent = "יש להוסיף לפחות ספר אחד עם כמות"; return; }
+      const body = {
+        date: document.getElementById("w_date").value, warehouse_id: document.getElementById("w_warehouse").value,
+        is_full_set: document.getElementById("w_isFullSet_flag").value === "1", reason: document.getElementById("w_reason").value,
+        notes: document.getElementById("w_notes").value, items, created_by: currentUser.id,
+      };
+      try {
+        const res = await fetch(`${API_BASE}/api/book-withdrawals`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "השרת דחה את הבקשה");
+        closeModal("withdrawalModal");
+        if (data.warnings && data.warnings.length) {
+          showToast("המשיכה נשמרה, אך שים לב: אין מספיק מלאי עבור " + data.warnings.length + " פריט/ים", "info");
+        } else { showToast("המשיכה נשמרה", "ok"); }
+        loadWithdrawals(); loadInventory(); loadDashboard();
+      } catch (err) { msg.className = "msg err"; msg.textContent = err.message; }
+    });
+    async function loadWithdrawals() {
+      skeletonRows("#t_withdrawals tbody", 7);
+      const res = await fetch(`${API_BASE}/api/book-withdrawals`);
+      const rows = await res.json();
+      const tbody = document.querySelector("#t_withdrawals tbody");
+      if (!rows.length) { tbody.innerHTML = `<tr><td colspan="7">${emptyStateHTML({ icon: "package-minus", title: "אין עדיין משיכות רשומות" })}</td></tr>`; refreshIcons(); return; }
+      tbody.innerHTML = rows.map(w => `<tr>
+        <td data-label="תאריך">${esc(w.date)}</td>
+        <td data-label="מחסן">${esc(w.warehouse_name)}</td>
+        <td data-label="פריטים">${w.items.map(it => `${esc(it.book_name)} (${esc(it.edition_label)}) x${it.quantity}`).join("<br>")}</td>
+        <td data-label="סיבה">${esc(w.reason || "")}</td>
+        <td data-label="סט מלא">${w.is_full_set ? '<span class="badge badge-gold">כן</span>' : "-"}</td>
+        <td data-label="הערות">${esc(w.notes || "")}</td>
+        <td><button class="btn btn-icon btn-secondary" style="color:var(--color-danger-text);" title="מחק" onclick="deleteWithdrawal(${w.id})"><i data-lucide="trash-2"></i></button></td>
+      </tr>`).join("");
+      refreshIcons();
+    }
+    async function deleteWithdrawal(id) {
+      if (!confirm("למחוק את רשומת המשיכה הזו? זה יגדיל את המלאי בהתאם.")) return;
+      await fetch(`${API_BASE}/api/book-withdrawals/${id}`, { method: "DELETE" });
+      showToast("המשיכה נמחקה", "ok"); loadWithdrawals(); loadInventory(); loadDashboard();
+    }
+
+    /* ===================== הגדרות ===================== */
+    function showSettingsSub(name) {
+      document.querySelectorAll(".settings-subtab").forEach(b => b.classList.toggle("active", b.dataset.sub === name));
+      document.querySelectorAll(".settings-sub").forEach(p => p.classList.toggle("hidden", p.id !== "settingsSub-" + name));
+      if (name === "categories") { document.getElementById("cat_expenses").value = settingsCache.expense_categories; document.getElementById("cat_incomes").value = settingsCache.income_categories; }
+      if (name === "books") renderBooksManageList();
+      if (name === "warehouses") renderWarehousesManageTable();
+      if (name === "profile") {
+        document.getElementById("pr_fullname").value = currentUser.full_name || "";
+        document.getElementById("pr_role").value = currentUser.role || "";
+        document.getElementById("pr_phone").value = currentUser.phone || "";
+        document.getElementById("pr_email").value = currentUser.email || "";
+      }
+      if (name === "sheet") loadSheetSettingsInfo();
+    }
+    function loadSettingsTab() { showSettingsSub("profile"); }
+
+    document.getElementById("profileForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const msg = document.getElementById("pr_msg");
+      const fields = {
+        full_name: document.getElementById("pr_fullname").value, role: document.getElementById("pr_role").value,
+        phone: document.getElementById("pr_phone").value, email: document.getElementById("pr_email").value,
+      };
+      try {
+        const res = await fetch(`${API_BASE}/api/users/${currentUser.id}/profile`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(fields) });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "השרת דחה את השמירה");
+        currentUser = data; localStorage.setItem("pcf_user", JSON.stringify(data));
+        document.getElementById("sidebarUserName").textContent = currentUser.full_name || currentUser.username;
+        document.getElementById("sidebarUserRole").textContent = currentUser.role || "חשבון פעיל";
+        msg.className = "msg ok"; msg.textContent = "הפרופיל נשמר - יישמר לצמיתות גם בכניסה הבאה.";
+        showToast("הפרופיל נשמר", "ok");
+      } catch (err) { msg.className = "msg err"; msg.textContent = err.message; }
+    });
+
+    async function saveCategoriesSettings() {
+      const body = { expense_categories: document.getElementById("cat_expenses").value, income_categories: document.getElementById("cat_incomes").value };
+      const res = await fetch(`${API_BASE}/api/settings`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+      const msg = document.getElementById("cat_msg");
+      if (!res.ok) { msg.className = "msg err"; msg.textContent = "השמירה נכשלה"; return; }
+      await loadSettings();
+      msg.className = "msg ok"; msg.textContent = "הקטגוריות נשמרו";
+      showToast("הקטגוריות נשמרו", "ok");
+    }
+
+    function renderBooksManageList() {
+      const div = document.getElementById("booksManageList");
+      div.innerHTML = booksCache.map(b => `
+        <div class="card" style="padding:16px;margin-bottom:12px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+            <b>${esc(b.name)}</b>
+            <button class="btn btn-sm secondary" onclick="addBookEdition(${b.id})"><i data-lucide="plus"></i>הוסף מהדורה</button>
+          </div>
+          <div class="table-wrap"><table class="data-table"><thead><tr><th>מהדורה</th><th>מחיר מכירה</th><th>בסט מלא</th><th>פעיל</th></tr></thead>
+          <tbody>${(b.editions || []).map(e => `<tr>
+            <td>${esc(e.edition_label)}</td>
+            <td><input type="number" step="0.01" value="${e.sale_price ?? ""}" style="width:110px;padding:6px 8px;font-size:13px;" onchange="updateEdition(${e.id},{sale_price:this.value})"></td>
+            <td><input type="checkbox" ${e.include_in_set ? "checked" : ""} onchange="updateEdition(${e.id},{include_in_set:this.checked})"></td>
+            <td><input type="checkbox" ${e.active ? "checked" : ""} onchange="updateEdition(${e.id},{active:this.checked})"></td>
+          </tr>`).join("")}</tbody></table></div>
+        </div>`).join("");
+    }
+    async function addBook() {
+      const name = document.getElementById("newBookName").value.trim();
+      if (!name) return;
+      const res = await fetch(`${API_BASE}/api/books`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name }) });
+      if (!res.ok) { showToast("שגיאה בהוספת ספר", "err"); return; }
+      document.getElementById("newBookName").value = "";
+      await loadBooks(); renderBooksManageList(); showToast("הספר נוסף", "ok");
+    }
+    async function addBookEdition(bookId) {
+      const label = prompt("שם המהדורה (למשל: רכה / קשה / רגיל):"); if (!label) return;
+      const res = await fetch(`${API_BASE}/api/books/${bookId}/editions`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ edition_label: label }) });
+      if (!res.ok) { showToast("שגיאה בהוספת מהדורה", "err"); return; }
+      await loadBooks(); renderBooksManageList(); showToast("המהדורה נוספה", "ok");
+    }
+    async function updateEdition(id, patch) {
+      await fetch(`${API_BASE}/api/book-editions/${id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(patch) });
+      await loadBooks();
+      showToast("נשמר", "ok");
+    }
+
+    function renderWarehousesManageTable() {
+      const tbody = document.querySelector("#t_warehouses_manage tbody");
+      tbody.innerHTML = warehousesCache.map(w => `<tr>
+        <td><input type="text" value="${esc(w.name)}" style="width:160px;padding:6px 8px;font-size:13px;" onchange="updateWarehouse(${w.id},{name:this.value})"></td>
+        <td><select onchange="updateWarehouse(${w.id},{type:this.value})">
+          <option value="warehouse" ${w.type === "warehouse" ? "selected" : ""}>מחסן</option>
+          <option value="sales_point" ${w.type === "sales_point" ? "selected" : ""}>נקודת מכירה</option>
+        </select></td>
+        <td><input type="checkbox" ${w.active ? "checked" : ""} onchange="updateWarehouse(${w.id},{active:this.checked})"></td>
+        <td></td>
+      </tr>`).join("");
+    }
+    async function addWarehouse() {
+      const name = document.getElementById("newWarehouseName").value.trim();
+      const type = document.getElementById("newWarehouseType").value;
+      if (!name) return;
+      const res = await fetch(`${API_BASE}/api/warehouses`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name, type }) });
+      if (!res.ok) { showToast("שגיאה בהוספת מחסן", "err"); return; }
+      document.getElementById("newWarehouseName").value = "";
+      await loadWarehouses(); renderWarehousesManageTable(); showToast("המחסן נוסף", "ok");
+    }
+    async function updateWarehouse(id, patch) {
+      await fetch(`${API_BASE}/api/warehouses/${id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(patch) });
+      await loadWarehouses();
+      showToast("נשמר", "ok");
+    }
+
+    /* ===================== גיליון גיבוי ===================== */
+    async function openSheet() {
+      const win = window.open("", "_blank");
+      win.document.write("טוען את הגיליון... (בפעם הראשונה זה יכול לקחת עד חצי דקה)");
+      try {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 25000);
+        const res = await fetch(`${API_BASE}/api/sheet`, { signal: controller.signal });
+        clearTimeout(timeout);
+        const data = await res.json();
+        if (data.link) { win.location.href = data.link; } else { win.document.write("שגיאה: " + (data.error || "לא ידועה")); }
+      } catch (err) { win.document.write("שגיאה בטעינה: " + err.message); }
+    }
+    async function forceSyncSheet() {
+      showToast("מסנכרן...", "info");
+      const res = await fetch(`${API_BASE}/api/sync-sheet`, { method: "POST" });
+      if (res.ok) { showToast("הסנכרון הושלם", "ok"); loadSheetSettingsInfo(); } else { showToast("הסנכרון נכשל", "err"); }
+    }
+    async function loadSheetSettingsInfo() {
+      const res = await fetch(`${API_BASE}/api/settings`);
+      const s = await res.json();
+      document.getElementById("sheetSyncedAt").textContent = s.sheet_last_synced_at ? "סונכרן לאחרונה: " + new Date(s.sheet_last_synced_at).toLocaleString("he-IL") : "טרם בוצע סנכרון";
+    }
+
+    loadUserList();
+    if (!tryAutoLogin()) { /* נשאר במסך ההתחברות */ }
+  </script>
+</body>
+</html>
