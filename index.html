@@ -129,6 +129,22 @@ a { color:var(--color-primary); }
 .stat-icon.danger { background:var(--color-danger-bg); color:var(--color-danger-text); }
 .stat-icon.success { background:var(--color-success-bg); color:var(--color-success-text); }
 .stat-icon.gold { background:var(--color-gold-bg); color:var(--color-gold); }
+
+.quick-actions-groups { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:22px; }
+@media (max-width:640px) { .quick-actions-groups { grid-template-columns:1fr; } }
+.quick-group { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); box-shadow:var(--shadow-sm); padding:14px; }
+.quick-group-label { display:flex; align-items:center; gap:8px; font-weight:700; font-size:14px; color:var(--text-secondary); margin-bottom:10px; }
+.quick-group-label svg { width:16px; height:16px; }
+.quick-group-buttons { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+@media (max-width:420px) { .quick-group-buttons { grid-template-columns:1fr; } }
+.quick-btn { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; padding:16px 8px; min-height:64px; border-radius:var(--radius-md); border:1px solid transparent; font-size:13px; font-weight:700; cursor:pointer; transition:transform .1s, box-shadow .15s; }
+.quick-btn:active { transform:translateY(1px); }
+.quick-btn svg { width:20px; height:20px; }
+.quick-btn.qb-danger { background:var(--color-danger-bg); color:var(--color-danger-text); }
+.quick-btn.qb-success { background:var(--color-success-bg); color:var(--color-success-text); }
+.quick-btn.qb-primary { background:var(--color-primary-bg); color:var(--color-primary-dark); }
+.quick-btn.qb-gold { background:var(--color-gold-bg); color:var(--color-gold); }
+.quick-btn:hover { box-shadow:var(--shadow-md); }
 .stat-value { font-size:24px; font-weight:800; color:var(--text-title); letter-spacing:-.5px; }
 .stat-trend { font-size:12px; margin-top:6px; color:var(--text-muted); }
 
@@ -408,6 +424,23 @@ table.data-table td[contenteditable="true"]:focus { outline:none; background:var
               <div class="text-secondary" style="margin-top:4px;">סקירת מצב פניני חיזוק - כספים</div>
             </div>
 
+            <div class="quick-actions-groups">
+              <div class="quick-group">
+                <div class="quick-group-label"><i data-lucide="wallet"></i>כספים</div>
+                <div class="quick-group-buttons">
+                  <button class="quick-btn qb-danger" onclick="openExpenseModal()"><i data-lucide="trending-down"></i>הוצאה חדשה</button>
+                  <button class="quick-btn qb-success" onclick="openIncomeModal()"><i data-lucide="trending-up"></i>הכנסה חדשה</button>
+                </div>
+              </div>
+              <div class="quick-group">
+                <div class="quick-group-label"><i data-lucide="book-marked"></i>ספרים</div>
+                <div class="quick-group-buttons">
+                  <button class="quick-btn qb-primary" onclick="openFillModal()"><i data-lucide="package-plus"></i>מילוי מלאי</button>
+                  <button class="quick-btn qb-gold" onclick="openWithdrawalModal()"><i data-lucide="package-minus"></i>משיכת ספרים</button>
+                </div>
+              </div>
+            </div>
+
             <div class="stat-grid">
               <div class="stat-card" onclick="showTab('expenses')">
                 <div class="row1"><div class="card-title">הוצאות החודש</div><div class="stat-icon primary"><i data-lucide="trending-down"></i></div></div>
@@ -487,10 +520,13 @@ table.data-table td[contenteditable="true"]:focus { outline:none; background:var
             </div>
             <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;">
               <select id="inc_category" class="cat-select" onchange="loadTab('incomes')" style="min-width:140px;"><option value="">כל הקטגוריות</option></select>
+              <select id="inc_status" class="cat-select" onchange="loadTab('incomes')" style="min-width:140px;">
+                <option value="">כל הסטטוסים</option><option value="pending">ממתין</option><option value="received">התקבל</option>
+              </select>
             </div>
             <div class="table-wrap">
               <table class="data-table" id="t_incomes"><thead><tr>
-                <th>תאריך</th><th>קטגוריה</th><th>סכום</th><th>ספר</th><th>הערות</th><th>נרשם ע"י</th><th></th>
+                <th>תאריך</th><th>קטגוריה</th><th>סכום</th><th>ספר</th><th>סטטוס</th><th>הערות</th><th>נרשם ע"י</th><th></th>
               </tr></thead><tbody></tbody></table>
             </div>
           </div>
@@ -661,6 +697,10 @@ table.data-table td[contenteditable="true"]:focus { outline:none; background:var
             <div class="field full-width" style="grid-column:1/-1;"><label>קטגוריה</label><select id="i_category" onchange="onIncomeCategoryChange()" required></select></div>
             <div class="field full-width hidden" id="i_bookField" style="grid-column:1/-1;"><label>ספר (אופציונלי)</label><select id="i_book_edition"></select></div>
             <div class="field full-width" style="grid-column:1/-1;"><label>הערות</label><textarea id="i_notes" rows="2"></textarea></div>
+            <div class="field full-width" style="grid-column:1/-1;">
+              <label>סטטוס</label>
+              <select id="i_status"><option value="received">התקבל</option><option value="pending">ממתין</option></select>
+            </div>
           </div>
         </div>
         <div class="modal-footer">
@@ -1175,22 +1215,26 @@ table.data-table td[contenteditable="true"]:focus { outline:none; background:var
     let incomesCacheById = {};
     async function loadIncomes() {
       skeletonRows("#t_incomes tbody", 6);
-      const month = monthInput.value, category = document.getElementById("inc_category").value;
+      const month = monthInput.value, category = document.getElementById("inc_category").value, status = document.getElementById("inc_status").value;
       const params = new URLSearchParams({ month });
       if (category) params.set("category", category);
+      if (status) params.set("status", status);
       const res = await fetch(`${API_BASE}/api/incomes?${params}`);
       const rows = await res.json();
       incomesCacheById = {}; rows.forEach(r => incomesCacheById[r.id] = r);
       const tbody = document.querySelector("#t_incomes tbody");
-      if (!rows.length) { tbody.innerHTML = `<tr><td colspan="6">${emptyStateHTML({ icon: "hand-coins", title: "אין הכנסות בחודש הזה" })}</td></tr>`; refreshIcons(); return; }
+      if (!rows.length) { tbody.innerHTML = `<tr><td colspan="8">${emptyStateHTML({ icon: "hand-coins", title: "אין הכנסות בחודש הזה" })}</td></tr>`; refreshIcons(); return; }
       tbody.innerHTML = rows.map(r => `<tr>
         <td data-label="תאריך">${esc(r.date)}</td>
         <td data-label="קטגוריה"><span class="badge badge-neutral">${esc(r.category)}</span></td>
         <td data-label="סכום" class="num-cell">${fmtMoney(r.amount)}</td>
         <td data-label="ספר">${r.book_name ? esc(r.book_name + " (" + r.edition_label + ")") : "-"}</td>
+        <td data-label="סטטוס">${r.status === "received" ? '<span class="badge badge-success"><i data-lucide="badge-check"></i>התקבל</span>' : '<span class="badge badge-warning"><i data-lucide="clock"></i>ממתין</span>'}</td>
         <td data-label="הערות">${esc(r.notes || "")}</td>
+        <td data-label="נרשם ע\\"י">${esc(r.created_by_name || "-")}</td>
         <td style="display:flex;gap:6px;">
           <button class="btn btn-icon btn-secondary" title="ערוך" onclick="openIncomeModal(${r.id})"><i data-lucide="pencil"></i></button>
+          <button class="btn btn-icon btn-secondary" title="${r.status === "received" ? "סמן כממתין" : "סמן כהתקבל"}" onclick="toggleIncomeReceived(${r.id})"><i data-lucide="${r.status === "received" ? "rotate-ccw" : "badge-check"}"></i></button>
           <button class="btn btn-icon btn-secondary" style="color:var(--color-danger-text);" title="מחק" onclick="deleteIncome(${r.id})"><i data-lucide="trash-2"></i></button>
         </td>
       </tr>`).join("");
@@ -1207,8 +1251,8 @@ table.data-table td[contenteditable="true"]:focus { outline:none; background:var
         const r = incomesCacheById[id];
         document.getElementById("i_date").value = r.date; document.getElementById("i_amount").value = r.amount;
         document.getElementById("i_category").value = r.category; document.getElementById("i_notes").value = r.notes || "";
-        document.getElementById("i_book_edition").value = r.book_edition_id || "";
-      } else { document.getElementById("i_date").value = todayStrLocal(); }
+        document.getElementById("i_book_edition").value = r.book_edition_id || ""; document.getElementById("i_status").value = r.status || "received";
+      } else { document.getElementById("i_date").value = todayStrLocal(); document.getElementById("i_status").value = "received"; }
       onIncomeCategoryChange();
       openModal("incomeModal");
     }
@@ -1219,7 +1263,8 @@ table.data-table td[contenteditable="true"]:focus { outline:none; background:var
       const fields = {
         date: document.getElementById("i_date").value, category: document.getElementById("i_category").value,
         amount: document.getElementById("i_amount").value, notes: document.getElementById("i_notes").value,
-        book_edition_id: document.getElementById("i_book_edition").value, created_by: currentUser.id,
+        book_edition_id: document.getElementById("i_book_edition").value, status: document.getElementById("i_status").value,
+        created_by: currentUser.id,
       };
       try {
         const res = await fetch(`${API_BASE}/api/incomes${id ? "/" + id : ""}`, {
@@ -1229,6 +1274,15 @@ table.data-table td[contenteditable="true"]:focus { outline:none; background:var
         closeModal("incomeModal"); showToast("ההכנסה נשמרה", "ok"); loadIncomes(); loadDashboard();
       } catch (err) { msg.className = "msg err"; msg.textContent = err.message; }
     });
+    async function toggleIncomeReceived(id) {
+      const r = incomesCacheById[id]; if (!r) return;
+      const newStatus = r.status === "received" ? "pending" : "received";
+      try {
+        const res = await fetch(`${API_BASE}/api/incomes/${id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status: newStatus }) });
+        if (!res.ok) throw new Error("השרת דחה את השינוי");
+        showToast("הסטטוס עודכן", "ok"); loadIncomes(); loadDashboard();
+      } catch (err) { showToast("שגיאה: " + err.message, "err"); }
+    }
     async function deleteIncome(id) {
       if (!confirm("למחוק את ההכנסה הזו?")) return;
       try {
